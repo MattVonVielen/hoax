@@ -38,4 +38,10 @@ compile(AST) ->
     code:load_binary(Mod, "", Bin).
 
 get_exports(ModuleName) ->
-    [ E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info ].
+    case code:ensure_loaded(ModuleName) of
+        {error, nofile} ->
+            erlang:error({no_such_module_to_stub, ModuleName});
+        {module, ModuleName} ->
+            true = code:unstick_mod(ModuleName),
+            [ E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info ]
+    end.

@@ -6,6 +6,10 @@
 -include_lib("eunit/include/eunit.hrl").
 -define(assertIsExit(Error, Actual), ?assertMatch({'EXIT', {Error, _}}, Actual)).
 
+stub_should_throw_when_module_cannot_be_loaded_test() ->
+    Result = (catch stub(a_nonexistent_module, [])),
+    ?assertIsExit({no_such_module_to_stub, a_nonexistent_module}, Result).
+
 stub_should_throw_when_module_does_not_have_expected_function_test() ->
     Result = (catch stub(hoax_test_module, [
                 expect(nonexistent_function, [])
