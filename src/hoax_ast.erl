@@ -27,10 +27,12 @@ module(Name, Funcs, Expectations) ->
         default_clauses(Name, Funcs, fun unexpected_invocation/2),
         Expectations),
 
-    Exports = [make_export(K) || {K, _} <- dict:fetch_keys(FinalClauses)],
+    Exports = [make_export(K) || K <- dict:fetch_keys(FinalClauses)],
 
     [ module_attr(Name), export_attr(Exports) ] ++
-    [ function(atom(F), Clauses) || {{F,_}, Clauses} <- FinalClauses ].
+    dict:fold(fun({F,_}, Clauses, Acc) ->
+                [function(atom(F), Clauses)|Acc]
+        end, [], FinalClauses).
 
 default_clauses(Name, Funcs, DefaultClauseFun) ->
     lists:foldl(
