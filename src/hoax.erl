@@ -3,6 +3,7 @@
 -export([stub/1, stub/2,
         %fake/2,
         stub_a/2, stub_a/3,
+        expect/2,
         expect/3,
         and_return/1,
         and_throw/1,
@@ -20,6 +21,7 @@ stub_a(Behaviour, ModuleName, Expectations) ->
     Funcs = Behaviour:behaviour_info(callbacks),
     compile(hoax_ast:module(ModuleName, Funcs, Expectations)).
 
+expect(Func, Args) -> expect(Func, Args, and_return(ok)).
 expect(Func, Args, Action) -> {Func, Args, Action}.
 
 and_return(Value) -> {return, Value}.

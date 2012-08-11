@@ -62,7 +62,7 @@ add_expectation({Func, Args, Action}, FuncDict) ->
     Key = {Func, length(Args)},
     case dict:find(Key, FuncDict) of
         error ->
-            erlang:throw({no_such_function, Key});
+            erlang:error({no_such_function_to_stub, Key});
         {ok, Clauses} ->
             Clause = expected_invocation(Args, Action),
             dict:store(Key, [Clause|Clauses], FuncDict)
