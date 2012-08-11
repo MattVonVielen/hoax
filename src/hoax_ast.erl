@@ -80,7 +80,7 @@ variables_for_arity(Arity) ->
     [ variable("V"++integer_to_list(Num)) || Num <- lists:seq(1,Arity) ].
 
 throw_exception(Exception) ->
-    Throw = module_qualifier(atom(erlang), atom(throw)),
+    Throw = module_qualifier(atom(erlang), atom(error)),
     application(Throw, [Exception]).
 
 m_f_args(M, F, Args) ->
