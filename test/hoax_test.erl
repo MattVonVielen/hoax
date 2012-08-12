@@ -4,14 +4,19 @@
 -import(hoax, [stub/2, expect/2, expect/3, and_return/1]).
 
 -include_lib("eunit/include/eunit.hrl").
--define(assertIsExit(Error, Actual), ?assertMatch({'EXIT', {Error, _}}, Actual)).
+
+-define(FAKE_MOD, a_nonexistent_module).
+-define(FAKE_FUN, nonexistent_function).
+-define(REAL_MOD, hoax_test_module).
 
 stub_should_throw_when_module_cannot_be_loaded_test() ->
-    Result = (catch stub(a_nonexistent_module, [])),
-    ?assertIsExit({no_such_module_to_stub, a_nonexistent_module}, Result).
+    ExpectedError = {no_such_module_to_stub, ?FAKE_MOD},
+    ?assertError(ExpectedError, stub(?FAKE_MOD, [])).
 
 stub_should_throw_when_module_does_not_have_expected_function_test() ->
-    Result = (catch stub(hoax_test_module, [
-                expect(nonexistent_function, [])
-            ])),
-    ?assertIsExit({no_such_function_to_stub, {nonexistent_function, 0}}, Result).
+    ExpectedError = {no_such_function_to_stub, {?FAKE_FUN, 0}},
+    ?assertError(ExpectedError,
+        stub(?REAL_MOD, [
+                expect(?FAKE_FUN, [])
+            ])).
+
