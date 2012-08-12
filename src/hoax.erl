@@ -38,8 +38,8 @@ and_return(Value) -> {return, Value}.
 and_throw(Error) -> {throw, Error}.
 
 unload(ModuleName) ->
-    code:delete(ModuleName),
-    code:purge(ModuleName).
+    code:purge(ModuleName),
+    code:delete(ModuleName).
 
 %%%%%%%%%%%%%
 
