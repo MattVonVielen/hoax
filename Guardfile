@@ -2,19 +2,14 @@
 # automatically run the eunit tests
 
 guard 'shell' do
-  watch(%r{^(?:src|test)/([^.].*?)(?:_test)?.erl$}) do |m|
-    suite = m[1]
-    looking_for = File.join(File.dirname(__FILE__), 'test', "#{suite}_test.erl")
-    if File.exist?(looking_for)
-      cmd = "./rebar eunit skip_deps=true suite=#{suite}"
-      puts `#{cmd}`
-      if $? == 0
-        Growl.notify_ok "#{suite}: eunit passed."
-      else
-        Growl.notify_error "#{suite}: eunit failed"
-      end
+  app = File.basename(Dir.pwd)
+  watch(%r{^(?:src|include|test)/(?:[^.].*?).[eh]rl$}) do
+    cmd = "./rebar eunit skip_deps=true"
+    puts `#{cmd}`
+    if $? == 0
+      Growl.notify_ok "#{app}: eunit passed."
     else
-      Growl.notify_warning "No tests for #{suite}!"
+      Growl.notify_error "#{app}: eunit failed"
     end
   end
 end
