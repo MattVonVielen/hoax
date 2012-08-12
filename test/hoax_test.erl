@@ -4,7 +4,6 @@
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("hoax/include/hoax.hrl").
--import(hoax, ?HOAX_API).
 
 -define(FAKE_MOD, a_nonexistent_module).
 -define(FAKE_FUN, nonexistent_function).

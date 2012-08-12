@@ -12,3 +12,8 @@
     unload/1
   ]).
 
+-ifdef(IN_HOAX_ERL).
+-export(?HOAX_API).
+-else.
+-import(hoax, ?HOAX_API).
+-endif.

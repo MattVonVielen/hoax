@@ -1,7 +1,7 @@
 -module(hoax).
 
+-define(IN_HOAX_ERL, true).
 -include("hoax.hrl").
--export(?HOAX_API).
 
 stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
