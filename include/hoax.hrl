@@ -14,6 +14,7 @@
 
 -ifdef(IN_HOAX_ERL).
 -export(?HOAX_API).
+-ignore_xref(?HOAX_API).
 -else.
 -import(hoax, ?HOAX_API).
 -endif.
