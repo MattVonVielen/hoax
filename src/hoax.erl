@@ -1,18 +1,11 @@
 -module(hoax).
 
--export([stub/1, stub/2,
-        fake/2,
-        stub_a/2, stub_a/3,
-        expect/2,
-        expect/3,
-        and_return/1,
-        and_throw/1,
-        unload/1
-    ]).
+-include("hoax.hrl").
+-export(?HOAX_API).
 
 stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
-    unload(ModuleName),
+    purge_and_delete(ModuleName),
     Funcs = case module_exists(ModuleName) of
         false ->
             erlang:error({no_such_module_to_stub, ModuleName});
@@ -42,13 +35,27 @@ and_return(Value) -> {return, Value}.
 
 and_throw(Error) -> {throw, Error}.
 
+unload() ->
+    lists:foreach(fun unload/1, hoax_dict:get_mods()).
+
 unload(ModuleName) ->
-    code:purge(ModuleName),
-    code:delete(ModuleName).
+    case hoax_dict:has_mod(ModuleName) of
+        true ->
+            hoax_dict:del_mod(ModuleName),
+            purge_and_delete(ModuleName);
+        false ->
+            erlang:error({not_hoaxed, ModuleName})
+    end.
 
 %%%%%%%%%%%%%
 
+purge_and_delete(ModuleName) ->
+    code:purge(ModuleName),
+    code:delete(ModuleName).
+
+
 mock(ModuleName, Funcs, Expectations) ->
+    hoax_dict:add_mod(ModuleName),
     AST = hoax_ast:module(ModuleName, Funcs, Expectations),
     Forms = erl_syntax:revert_forms(AST),
     {ok, Mod, Bin} = compile:forms(Forms),

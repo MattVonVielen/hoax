@@ -1,9 +1,10 @@
 -module(hoax_test).
 
 -compile([export_all]).
--import(hoax, [stub/2, expect/2, expect/3, and_return/1, and_throw/1, fake/2, unload/1]).
 
 -include_lib("eunit/include/eunit.hrl").
+-include_lib("hoax/include/hoax.hrl").
+-import(hoax, ?HOAX_API).
 
 -define(FAKE_MOD, a_nonexistent_module).
 -define(FAKE_FUN, nonexistent_function).
@@ -89,4 +90,17 @@ stub_should_return_default_value_when_args_do_not_match_test() ->
 
     ?assertEqual(ok, ?REAL_MOD:?REAL_FUN(arg1, not_matching_arg)),
     unload(?REAL_MOD).
+
+unload_should_throw_when_module_not_hoaxed_test() ->
+    ?assertError({not_hoaxed, ?REAL_MOD}, unload(?REAL_MOD)).
+
+unload_0_should_unload_all_hoaxed_modules_test() ->
+    fake(?FAKE_MOD, []),
+    stub(?REAL_MOD, []),
+
+    unload(),
+
+    ?assertMatch({error,nofile}, code:ensure_loaded(?FAKE_MOD)),
+    ?assertMatch({module, ?REAL_MOD}, code:ensure_loaded(?REAL_MOD)),
+    ?assertEqual({?REAL_FUN, 1, 2}, ?REAL_MOD:?REAL_FUN(1,2)).
 
