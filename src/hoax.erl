@@ -12,9 +12,14 @@
 
 stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
-    ModName = list_to_atom(atom_to_list(ModuleName) ++ "_hoax"),
-    Funcs = get_exports(ModuleName),
-    mock(ModName, Funcs, Expectations).
+    unload(ModuleName),
+    Funcs = case module_exists(ModuleName) of
+        false ->
+            erlang:error({no_such_module_to_stub, ModuleName});
+        true ->
+            [ E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info ]
+    end,
+    mock(ModuleName, Funcs, Expectations).
 
 fake(ModuleName, Expectations) ->
     case module_exists(ModuleName) of
@@ -48,14 +53,6 @@ mock(ModuleName, Funcs, Expectations) ->
     Forms = erl_syntax:revert_forms(AST),
     {ok, Mod, Bin} = compile:forms(Forms),
     code:load_binary(Mod, "", Bin).
-
-get_exports(ModuleName) ->
-    case module_exists(ModuleName) of
-        false ->
-            erlang:error({no_such_module_to_stub, ModuleName});
-        true ->
-            [ E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info ]
-    end.
 
 module_exists(ModuleName) ->
     case code:ensure_loaded(ModuleName) of
