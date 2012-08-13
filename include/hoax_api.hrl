@@ -1,4 +1,6 @@
 -define(HOAX_API, [
+        start/0,
+        stop/0,
         stub/1,
         stub/2,
         stub_a/2,

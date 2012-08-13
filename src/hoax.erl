@@ -4,15 +4,41 @@
 -export(?HOAX_API).
 -ignore_xref(?HOAX_API).
 
+-behaviour(application).
+
+%% Application callbacks
+-export([start/2, stop/1]).
+
+%% ===================================================================
+%% Application callbacks
+%% ===================================================================
+
+start(_StartType, _StartArgs) ->
+    hoax_sup:start_link().
+
+stop(_State) ->
+    ok.
+
+%% ===================================================================
+%% hoax API
+%% ===================================================================
+
+start() ->
+    application:start(hoax).
+
+stop() ->
+    unload(),
+    application:stop(hoax).
+
 stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
     purge_and_delete(ModuleName),
     Funcs = case module_exists(ModuleName) of
-        false ->
-            erlang:error({no_such_module_to_stub, ModuleName});
-        true ->
-            [ E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info ]
-    end,
+		false ->
+		    erlang:error({no_such_module_to_stub, ModuleName});
+		true ->
+		    get_exports(ModuleName)
+	    end,
     mock(ModuleName, Funcs, Expectations).
 
 fake(ModuleName, Expectations) ->
@@ -67,4 +93,7 @@ module_exists(ModuleName) ->
         {error, nofile} -> false;
         {module, ModuleName} -> true
     end.
+
+get_exports(ModuleName) ->
+    [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info].
 
