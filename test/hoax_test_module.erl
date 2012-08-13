@@ -4,6 +4,3 @@
 
 exported_function(A, B) ->
     {exported_function, A, B}.
-
-unexported_function(A, B) ->
-    {unexported_function, A, B}.

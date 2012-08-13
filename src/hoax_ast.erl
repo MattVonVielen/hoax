@@ -1,7 +1,5 @@
 -module(hoax_ast).
 
--compile([export_all]).
-
 -import(erl_syntax, [
         abstract/1,
         application/2,
@@ -17,6 +15,8 @@
         underscore/0,
         variable/1
     ]).
+
+-export([module/3]).
 
 % -type(ast() :: erl_syntax:syntax_tree()).
 % -type(func() :: {FA::{atom(), integer()}, {Export::ast(), Clauses::[ast()]}}).
@@ -53,11 +53,6 @@ unexpected_invocation(_, {_, A}) ->
     Args = lists:map(fun(_) -> underscore() end, lists:seq(1,A)),
     clause(Args, [], [atom(ok)]).
 
-unexpected_invocation_exception(M, {F, A}) ->
-    Args = variables_for_arity(A),
-    Exception = tuple([atom(unexpected_invocation), m_f_args(M, F, Args)]),
-    clause(Args, [], [throw_exception(Exception)]).
-
 add_expectation({Func, Args, Action}, FuncDict) ->
     Key = {Func, length(Args)},
     case dict:find(Key, FuncDict) of
@@ -76,13 +71,21 @@ function_body({return, Value}) ->
 function_body({throw, Error}) ->
     throw_exception(abstract(Error)).
 
-variables_for_arity(Arity) ->
-    [ variable("V"++integer_to_list(Num)) || Num <- lists:seq(1,Arity) ].
-
 throw_exception(Exception) ->
     Throw = module_qualifier(atom(erlang), atom(error)),
     application(Throw, [Exception]).
 
+% These support a strict-mocking mode, not yet implemented
+-ifdef(false).
+unexpected_invocation_exception(M, {F, A}) ->
+    Args = variables_for_arity(A),
+    Exception = tuple([atom(unexpected_invocation), m_f_args(M, F, Args)]),
+    clause(Args, [], [throw_exception(Exception)]).
+
 m_f_args(M, F, Args) ->
     tuple([atom(M), atom(F), list(Args)]).
 
+variables_for_arity(Arity) ->
+    [ variable("V"++integer_to_list(Num)) || Num <- lists:seq(1,Arity) ].
+
+-endif.

@@ -4,7 +4,7 @@
 guard 'shell' do
   app = File.basename(Dir.pwd)
   watch(%r{^(?:src|include|test)/(?:[^.].*?).[eh]rl$}) do
-    cmd = "./rebar eunit skip_deps=true"
+    cmd = "./rebar clean compile xref eunit skip_deps=true"
     puts `#{cmd}`
     if $? == 0
       Growl.notify_ok "#{app}: eunit passed."
