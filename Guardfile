@@ -3,8 +3,13 @@
 
 guard 'shell' do
   app = File.basename(Dir.pwd)
-  watch(%r{^(?:src|include|test)/(?:[^.].*?).[eh]rl$}) do
-    cmd = "./rebar clean compile xref eunit skip_deps=true"
+  watch(%r{^(.*/)?(?:src|test)/([^.].*?)(?:_tests?)?.erl$}) do |matches|
+    suite = matches[2]
+
+    test_module = File.join 'test', "#{suite}_test*.erl"
+    test_module = File.join matches[1], test_module if matches[1]
+
+    cmd = "./rebar eunit skip_deps=true suite=#{suite}"
     puts `#{cmd}`
     if $? == 0
       Growl.notify_ok "#{app}: eunit passed."
