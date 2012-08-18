@@ -89,7 +89,7 @@ function global:Handle-Event($Event) {
         $suite = $matches[2]
 
         $test_module = Join-Path test "${suite}_test*.erl"
-        if($matches[1]) {$test_module = Join-Path $prefix $test_module}
+        if($matches[1]) {$test_module = Join-Path $matches[1] $test_module}
 
         $currentdate = Get-Date -Format g
 
