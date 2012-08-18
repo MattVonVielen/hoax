@@ -9,11 +9,14 @@
 %% ===================================================================
 
 start() ->
-    application:start(hoax).
+    hoax_srv:start().
 
 stop() ->
-    unload(),
-    application:stop(hoax).
+    case erlang:whereis(hoax_srv) of
+        undefined -> ok;
+        _ ->
+            lists:foreach(fun purge_and_delete/1, hoax_srv:stop())
+    end.
 
 stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
@@ -47,18 +50,6 @@ and_return(Value) -> {return, Value}.
 
 and_throw(Error) -> {throw, Error}.
 
-unload() ->
-    lists:foreach(fun unload/1, hoax_dict:get_mods()).
-
-unload(ModuleName) ->
-    case hoax_dict:has_mod(ModuleName) of
-        true ->
-            hoax_dict:del_mod(ModuleName),
-            purge_and_delete(ModuleName);
-        false ->
-            erlang:error({not_hoaxed, ModuleName})
-    end.
-
 %%%%%%%%%%%%%
 
 purge_and_delete(ModuleName) ->
@@ -67,7 +58,7 @@ purge_and_delete(ModuleName) ->
 
 
 mock(ModuleName, Funcs, Expectations) ->
-    hoax_dict:add_mod(ModuleName),
+    hoax_srv:add_mod(ModuleName),
     AST = hoax_ast:module(ModuleName, Funcs, Expectations),
     Forms = erl_syntax:revert_forms(AST),
     {ok, Mod, Bin} = compile:forms(Forms),
@@ -81,4 +72,3 @@ module_exists(ModuleName) ->
 
 get_exports(ModuleName) ->
     [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info].
-

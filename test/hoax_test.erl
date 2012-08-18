@@ -7,34 +7,11 @@
 
 ?HOAX_FIXTURE.
 
-unload_should_remove_faked_module_from_vm() ->
-    fake(no_such_module, []),
-
-    unload(no_such_module),
-
-    Loaded = code:ensure_loaded(no_such_module),
-
-    ?assertMatch({error,nofile}, Loaded).
-
-unload_should_restore_stubbed_module_to_original() ->
-    stub(hoax_test_module, []),
-
-    unload(hoax_test_module),
-
-    Loaded = code:ensure_loaded(hoax_test_module),
-    ?assertMatch({module, hoax_test_module}, Loaded),
-
-    Result = hoax_test_module:exported_function(1, 2),
-    ?assertEqual({exported_function, 1, 2}, Result).
-
-unload_should_throw_when_module_not_hoaxed() ->
-    ?assertError({not_hoaxed, hoax_test_module}, unload(hoax_test_module)).
-
-unload_0_should_unload_all_hoaxed_modules() ->
+stop_should_unload_all_hoaxed_modules() ->
     fake(no_such_module, []),
     stub(hoax_test_module, []),
 
-    unload(),
+    stop(),
 
     IsFakeLoaded = code:ensure_loaded(no_such_module),
     ?assertMatch({error,nofile}, IsFakeLoaded),

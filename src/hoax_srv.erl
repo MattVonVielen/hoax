@@ -6,7 +6,7 @@
 %% API Function Exports
 %% ------------------------------------------------------------------
 
--export([start_link/0]).
+-export([start/0, add_mod/1, stop/0]).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Exports
@@ -19,16 +19,26 @@
 %% API Function Definitions
 %% ------------------------------------------------------------------
 
-start_link() ->
-    gen_server:start_link({local, ?SERVER}, ?MODULE, [], []).
+start() ->
+    gen_server:start({local, ?SERVER}, ?MODULE, [], []).
+
+add_mod(Mod) ->
+    gen_server:call(?SERVER, {add_mod, Mod}).
+
+stop() ->
+    gen_server:call(?SERVER, stop).
 
 %% ------------------------------------------------------------------
 %% gen_server Function Definitions
 %% ------------------------------------------------------------------
 
-init(Args) ->
-    {ok, Args}.
+init(_) ->
+    {ok, []}.
 
+handle_call({add_mod, Mod}, _, State) ->
+    {reply, ok, [Mod|State]};
+handle_call(stop, _, State) ->
+    {stop, normal, State, []};
 handle_call(_Request, _From, State) ->
     {reply, ok, State}.
 
