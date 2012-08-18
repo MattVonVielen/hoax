@@ -34,11 +34,11 @@ stub(M) -> stub(M, []).
 stub(ModuleName, Expectations) ->
     purge_and_delete(ModuleName),
     Funcs = case module_exists(ModuleName) of
-		false ->
-		    erlang:error({no_such_module_to_stub, ModuleName});
-		true ->
-		    get_exports(ModuleName)
-	    end,
+        false ->
+            erlang:error({no_such_module_to_stub, ModuleName});
+        true ->
+            get_exports(ModuleName)
+        end,
     mock(ModuleName, Funcs, Expectations).
 
 fake(ModuleName, Expectations) ->
