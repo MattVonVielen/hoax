@@ -10,8 +10,8 @@
 -define(HF_FIXTURE_BASE(Setup, Teardown, TestArity, TestDecl),
     ?HF_NAME() ->
         {foreach,
-            fun() -> Setup() end,
-            fun(X) -> Teardown(X), hoax:unload() end,
+            fun() -> hoax:start(), Setup() end,
+            fun(X) -> Teardown(X), hoax:stop() end,
             [ TestDecl ||
                 {F, A} <- ?MODULE:module_info(exports),
                 A == TestArity,
