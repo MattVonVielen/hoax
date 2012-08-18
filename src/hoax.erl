@@ -42,18 +42,18 @@ stub(ModuleName, Expectations) ->
     mock(ModuleName, Funcs, Expectations).
 
 fake(ModuleName, Expectations) ->
-    case module_exists(ModuleName) of
+    Funcs = case module_exists(ModuleName) of
         true ->
             erlang:error({module_exists, ModuleName});
         false ->
-            Funcs = [{F,length(A)} || {F,A,_} <- Expectations],
-            mock(ModuleName, Funcs, Expectations)
-    end.
-
-stub_a(B, M) -> stub_a(B, M, []).
-stub_a(Behaviour, ModuleName, Expectations) ->
-    Funcs = Behaviour:behaviour_info(callbacks),
+            [{F,length(A)} || {F,A,_} <- Expectations]
+    end,
     mock(ModuleName, Funcs, Expectations).
+
+%stub_a(B, M) -> stub_a(B, M, []).
+%stub_a(Behaviour, ModuleName, Expectations) ->
+%    Funcs = Behaviour:behaviour_info(callbacks),
+%    mock(ModuleName, Funcs, Expectations).
 
 expect(Func, Args) -> expect(Func, Args, and_return(ok)).
 expect(Func, Args, Action) -> {Func, Args, Action}.
