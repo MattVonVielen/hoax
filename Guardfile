@@ -12,9 +12,9 @@ guard 'shell' do
     cmd = "./rebar eunit skip_deps=true suite=#{suite}"
     puts `#{cmd}`
     if $? == 0
-      Growl.notify_ok "#{app}: eunit passed."
+      Growl.notify_ok "#{app}: eunit passed for #{suite}."
     else
-      Growl.notify_error "#{app}: eunit failed"
+      Growl.notify_error "#{app}: eunit failed for #{suite}"
     end
   end
 end
