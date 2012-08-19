@@ -1,91 +1,61 @@
 -module(hoax_ast).
 
--import(erl_syntax, [
-        abstract/1,
-        application/2,
-        arity_qualifier/2,
-        atom/1,
-        attribute/2,
-        clause/3,
-        function/2,
-        integer/1,
-        list/1,
-        module_qualifier/2,
-        tuple/1,
-        underscore/0,
-        variable/1
-    ]).
+-export([module/4]).
 
--export([module/3]).
+-type(return_action() :: {return, term()}).
+-type(throw_action() :: {throw, term()}).
+-type(action() :: return_action() | throw_action()).
+-type(expectation() :: {atom(), [term()], action()}).
 
-% -type(ast() :: erl_syntax:syntax_tree()).
-% -type(func() :: {FA::{atom(), integer()}, {Export::ast(), Clauses::[ast()]}}).
+module(Mod, Funcs, Expects, Strict) ->
+    erl_syntax:revert_forms([
+                             hoax_syntax:module_attribute(Mod),
+                             hoax_syntax:export_attribute(Funcs) |
+                             make_functions(Mod, Funcs, Expects, Strict)
+                            ]).
 
-module(Name, Funcs, Expectations) ->
-    FinalClauses = lists:foldl(
-        fun add_expectation/2,
-        default_clauses(Name, Funcs, fun unexpected_invocation/2),
-        Expectations),
+make_functions(Mod, Funcs, Expects, Strict) ->
+    Defaults = [ {Mod, Func, Strict} || Func <- Funcs ],
+    ClauseDict = make_clauses(Defaults, Expects),
+    dict:fold(fun make_function/3, [], ClauseDict).
 
-    Exports = [make_export(K) || K <- dict:fetch_keys(FinalClauses)],
+make_function({F,_}, Clauses, Functions) ->
+    [ hoax_syntax:function(F, Clauses) | Functions ].
 
-    [ module_attr(Name), export_attr(Exports) ] ++
-    dict:fold(fun({F,_}, Clauses, Acc) ->
-                [function(atom(F), Clauses)|Acc]
-        end, [], FinalClauses).
+make_clauses(Defaults, Expects) ->
+    ClauseDict = lists:foldl(fun make_default_clause/2, dict:new(), Defaults),
+    lists:foldl(fun add_expectation/2, ClauseDict, Expects).
 
-default_clauses(Name, Funcs, DefaultClauseFun) ->
-    lists:foldl(
-        fun(F,Acc) ->
-            dict:store(F, [DefaultClauseFun(Name, F)], Acc)
-        end, dict:new(), Funcs).
+make_default_clause({Mod, Func = {F, A}, Strict}, Dict) ->
+    Clause = case Strict of
+        permissive ->
+            hoax_syntax:wildcard_clause(A, [erl_syntax:atom(ok)]);
+        strict ->
+            unexpected_invocation_clause(Mod, F, A)
+    end,
+    dict:store(Func, [Clause], Dict).
 
-module_attr(Name) ->
-    attribute(atom(module), [atom(Name)]).
-
-export_attr(Funcs) ->
-    attribute(atom(export), [list(Funcs)]).
-
-make_export({F, A}) ->
-    arity_qualifier(atom(F), integer(A)).
-
-unexpected_invocation(_, {_, A}) ->
-    Args = lists:map(fun(_) -> underscore() end, lists:seq(1,A)),
-    clause(Args, [], [atom(ok)]).
-
+-spec(add_expectation( expectation(), dict() ) -> dict()).
 add_expectation({Func, Args, Action}, FuncDict) ->
     Key = {Func, length(Args)},
     case dict:find(Key, FuncDict) of
         error ->
-            erlang:error({no_such_function_to_stub, Key});
+            error({no_such_function_to_stub, Key});
         {ok, Clauses} ->
-            Clause = expected_invocation(Args, Action),
+            Body = case Action of
+                {return, Value} -> erl_syntax:abstract(Value);
+                {throw, Error} -> erlang_error(Error)
+            end,
+            Clause = hoax_syntax:exact_match_clause(Args, [Body]),
             dict:store(Key, [Clause|Clauses], FuncDict)
     end.
 
-expected_invocation(Args, Body) ->
-    clause([abstract(Arg) || Arg <- Args], [], [function_body(Body)]).
+erlang_error(Error) ->
+    hoax_syntax:function_call(erlang, error, [erl_syntax:abstract(Error)]).
 
-function_body({return, Value}) ->
-    abstract(Value);
-function_body({throw, Error}) ->
-    throw_exception(abstract(Error)).
-
-throw_exception(Exception) ->
-    Throw = module_qualifier(atom(erlang), atom(error)),
-    application(Throw, [Exception]).
-
-% These support a strict-mocking mode, not yet implemented
--ifdef(false).
-unexpected_invocation_exception(M, {F, A}) ->
-    Args = variables_for_arity(A),
-    Exception = tuple([atom(unexpected_invocation), m_f_args(M, F, Args)]),
-    clause(Args, [], [throw_exception(Exception)]).
-
-m_f_args(M, F, Args) ->
-    tuple([atom(M), atom(F), list(Args)]).
-
-variables_for_arity(Arity) ->
-    [ variable("V"++integer_to_list(Num)) || Num <- lists:seq(1,Arity) ].
-
--endif.
+unexpected_invocation_clause(M, F, A) ->
+    Args = hoax_syntax:variables(A),
+    MFArgs = hoax_syntax:m_f_args(M, F, Args),
+    Reason = erl_syntax:atom(unexpected_invocation),
+    Exception = erl_syntax:tuple([Reason, MFArgs]),
+    erl_syntax:clause(Args, [], [erlang_error(Exception)]).
