@@ -85,35 +85,38 @@ function Create-FileSystemWatcher($Path) {
 function global:Handle-Event($Event) {
     $file = $Event.SourceEventArgs.Name
 
-    if($file -match '^(.*\\)?(?:src|test)\\([^.].*?)(?:_tests?)?.erl$') {
+    if($file -match '^(.*\\)?(?:src|test)\\([^.].*?)(?:_test)?.erl$') {
         $suite = $matches[2]
+        $suite += "_test"
 
-        $test_module = Join-Path test "${suite}_test*.erl"
-        if($matches[1]) {$test_module = Join-Path $matches[1] $test_module}
-
-        $currentdate = Get-Date -Format g
+        $test_module = Join-Path test "${suite}.erl"
+        $app_filter = ""
+        if($matches[1]) {
+            $test_module = Join-Path $matches[1] $test_module
+            $app_filter = "apps=$(Split-Path -Leaf $matches[1])"
+        }
 
         if(Test-Path $test_module) {
-            $cmd = ".\rebar eunit skip_deps=true suite=$suite"
+            $cmd = ".\rebar eunit skip_deps=true suite=$suite $app_filter"
             Write-Host $cmd
             $output = Invoke-Expression $cmd
             if($LastExitCode -ne 0) {
                 Write-Host -Separator "`r`n" -ForegroundColor Red $output
                 $trayIcon.Notify("Error",
                                  "$suite - eunit failed",
-                                 "$currentdate - eunit failed for $suite")
+                                 "eunit failed for $suite")
             } else {
                 Write-Host -Separator "`r`n" -ForegroundColor Green $output
                 $trayIcon.Notify("Info",
                                  "$suite - eunit passed",
-                                 "$currentdate - eunit passed for $suite")
+                                 "eunit passed for $suite")
             }
         } else {
             $output = "No tests for $suite"
             Write-Host -Separator "`r`n" -ForegroundColor Yellow $output
             $trayIcon.Notify("Warning",
                              "$suite - no eunit tests",
-                             "$currentdate - no eunit tests for $suite")
+                             "no eunit tests for $suite")
         }
     }
 }
