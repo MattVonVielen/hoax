@@ -4,8 +4,8 @@
 -define(HF_NAME, hoax_fixture_test_).
 -define(HF_EMPTY_SETUP, fun() -> ok end).
 -define(HF_EMPTY_TEARDOWN, fun(_) -> ok end).
--define(HF_TEST_DECL, fun ?MODULE:F/0).
--define(HF_TEST_DECL_WITH_ARG, {with, [fun ?MODULE:F/1]}).
+-define(HF_TEST_DECL, {?MODULE, F}).
+-define(HF_TEST_DECL_WITH_ARG, {with, [?HF_TEST_DECL]}).
 
 -define(HF_FIXTURE_BASE(Setup, Teardown, TestArity, TestDecl),
     ?HF_NAME() ->
