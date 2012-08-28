@@ -59,9 +59,9 @@ do_hoax(ModuleName, Expectations, Strict) ->
 
 do_hoax(Behaviour, ModuleName, Expectations, Strict) ->
     hoax_code:module_exists(Behaviour) orelse
-        error({no_such_behaviour_to_stub, ModuleName}),
+        error({no_such_behaviour_to_mock, Behaviour}),
     erlang:function_exported(Behaviour, behaviour_info, 1) orelse
-        error({not_a_behaviour, ModuleName}),
+        error({not_a_behaviour, Behaviour}),
     hoax_code:module_exists(ModuleName) andalso
         error({module_exists, ModuleName}),
     make_hoax(ModuleName, hoax_code:get_callbacks(Behaviour), Expectations,
@@ -72,7 +72,7 @@ make_hoax(ModuleName, Funcs, Expectations, Strict) ->
     lists:foreach(
         fun({Func, _, _}) ->
             lists:member(Func, Funcs) orelse
-                error({no_such_function_to_stub, Func})
+                error({no_such_function_to_mock, Func})
         end, Expectations),
 
     Expects = [ {ModuleName, Func, Args, Action} ||
