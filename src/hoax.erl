@@ -33,7 +33,9 @@ fake(ModuleName, Expectations) ->
     hoax_code:module_exists(ModuleName) andalso
             error({module_exists, ModuleName}),
 
-    make_hoax(ModuleName, hoax_code:expectations_to_funcs(Expectations), Expectations).
+    Funcs = [ element(1,X) || X <- Expectations ],
+
+    make_hoax(ModuleName, Funcs, Expectations).
 
 %stub_a(B, M) -> stub_a(B, M, []).
 %stub_a(Behaviour, ModuleName, Expectations) ->
@@ -41,11 +43,11 @@ fake(ModuleName, Expectations) ->
 %    make_hoax(ModuleName, Funcs, Expectations).
 
 expect(Func, Args) -> expect(Func, Args, and_return(ok)).
-expect(Func, Args, Action) -> {Func, Args, Action}.
+expect(Func, Args, Action) -> hoax_ast:make_expectation(Func, Args, Action).
 
-and_return(Value) -> {return, Value}.
+and_return(Value) -> hoax_ast:return_value(Value).
 
-and_throw(Error) -> {throw, Error}.
+and_throw(Error) -> hoax_ast:throw_error(Error).
 
 %%%%%%%%%%%%%
 

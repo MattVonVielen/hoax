@@ -4,8 +4,7 @@
         compile/1,
         module_exists/1,
         get_exports/1,
-        purge_and_delete/1,
-        expectations_to_funcs/1
+        purge_and_delete/1
     ]).
 
 compile(Forms) ->
@@ -24,6 +23,3 @@ get_exports(ModuleName) ->
 purge_and_delete(ModuleName) ->
     code:purge(ModuleName),
     code:delete(ModuleName).
-
-expectations_to_funcs(Expectations) ->
-    [{F,length(A)} || {F,A,_} <- Expectations].

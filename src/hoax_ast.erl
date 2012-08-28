@@ -1,6 +1,6 @@
 -module(hoax_ast).
 
--export([module/4]).
+-export([module/4, make_expectation/3, return_value/1, throw_error/1]).
 
 -type(return_action() :: {return, term()}).
 -type(throw_action() :: {throw, term()}).
@@ -13,6 +13,12 @@ module(Mod, Funcs, Expects, Strict) ->
                              hoax_syntax:export_attribute(Funcs) |
                              make_functions(Mod, Funcs, Expects, Strict)
                             ]).
+
+make_expectation(Func, Args, Action) -> {{Func,length(Args)}, Args, Action}.
+
+return_value(Value) -> [erl_syntax:abstract(Value)].
+
+throw_error(Error) -> [erlang_error(Error)].
 
 make_functions(Mod, Funcs, Expects, Strict) ->
     Defaults = [ {Mod, Func, Strict} || Func <- Funcs ],
@@ -37,17 +43,12 @@ make_default_clause({Mod, Func = {F, A}, Strict}, Dict) ->
 
 -spec(add_expectation( expectation(), dict() ) -> dict()).
 add_expectation({Func, Args, Action}, FuncDict) ->
-    Key = {Func, length(Args)},
-    case dict:find(Key, FuncDict) of
+    case dict:find(Func, FuncDict) of
         error ->
-            error({no_such_function_to_stub, Key});
+            error({no_such_function_to_stub, Func});
         {ok, Clauses} ->
-            Body = case Action of
-                {return, Value} -> erl_syntax:abstract(Value);
-                {throw, Error} -> erlang_error(Error)
-            end,
-            Clause = hoax_syntax:exact_match_clause(Args, [Body]),
-            dict:store(Key, [Clause|Clauses], FuncDict)
+            Clause = hoax_syntax:exact_match_clause(Args, Action),
+            dict:store(Func, [Clause|Clauses], FuncDict)
     end.
 
 erlang_error(Error) ->
