@@ -4,6 +4,7 @@
         compile/1,
         module_exists/1,
         get_exports/1,
+        get_callbacks/1,
         purge_and_delete/1
     ]).
 
@@ -19,6 +20,9 @@ module_exists(ModuleName) ->
 
 get_exports(ModuleName) ->
     [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info].
+
+get_callbacks(Behaviour) ->
+    Behaviour:behaviour_info(callbacks).
 
 purge_and_delete(ModuleName) ->
     code:purge(ModuleName),
