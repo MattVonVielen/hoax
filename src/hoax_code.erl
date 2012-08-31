@@ -22,7 +22,17 @@ get_exports(ModuleName) ->
     [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info].
 
 get_callbacks(Behaviour) ->
-    Behaviour:behaviour_info(callbacks).
+    case module_exists(Behaviour) of
+        false ->
+            {error, {no_such_behaviour_to_mock, Behaviour}};
+        true ->
+            case erlang:function_exported(Behaviour, behaviour_info, 1) of
+                false ->
+                    {error, {not_a_behaviour, Behaviour}};
+                true ->
+                    {ok, Behaviour:behaviour_info(callbacks)}
+            end
+    end.
 
 purge_and_delete(ModuleName) ->
     code:purge(ModuleName),

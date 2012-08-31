@@ -58,14 +58,13 @@ do_hoax(ModuleName, Expectations, Strict) ->
               Strict).
 
 do_hoax(Behaviour, ModuleName, Expectations, Strict) ->
-    hoax_code:module_exists(Behaviour) orelse
-        error({no_such_behaviour_to_mock, Behaviour}),
-    erlang:function_exported(Behaviour, behaviour_info, 1) orelse
-        error({not_a_behaviour, Behaviour}),
     hoax_code:module_exists(ModuleName) andalso
         error({module_exists, ModuleName}),
-    make_hoax(ModuleName, hoax_code:get_callbacks(Behaviour), Expectations,
-              Strict).
+    Callbacks = case hoax_code:get_callbacks(Behaviour) of
+        {ok, List}     -> List;
+        {error, Error} -> error(Error)
+    end,
+    make_hoax(ModuleName, Callbacks, Expectations, Strict).
 
 make_hoax(ModuleName, Funcs, Expectations, Strict) ->
     hoax_srv:add_mod(ModuleName),
