@@ -23,58 +23,6 @@ stop_should_unload_all_hoaxed_modules() ->
     ?assertEqual({function_one, 1, 2}, Result).
 
 %%%' =================================
-%%%  Preconditions - stub
-%%%  =================================
-
-stub_should_throw_when_module_does_not_have_expected_function() ->
-    ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
-    ?assertError(ExpectedError,
-                 stub(hoax_test_module, [
-                                         expect(no_such_function, [])
-                                        ])).
-
-%%%. =================================
-
-%%%' =================================
-%%%  Preconditions - stub_behaviour
-%%%  =================================
-
-stub_behaviour_should_throw_when_behaviour_does_not_have_expected_callback() ->
-    ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
-    ?assertError(ExpectedError,
-                 stub(hoax_test_behaviour, name_of_mock, [
-                                         expect(no_such_function, [])
-                                        ])).
-
-%%%. =================================
-
-%%%' =================================
-%%%  Preconditions - mock
-%%%  =================================
-
-mock_should_throw_when_module_does_not_have_expected_function() ->
-    ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
-    ?assertError(ExpectedError,
-                 mock(hoax_test_module, [
-                                         expect(no_such_function, [])
-                                        ])).
-
-%%%. =================================
-
-%%%' =================================
-%%%  Preconditions - mock_behaviour
-%%%  =================================
-
-mock_behaviour_should_throw_when_behaviour_does_not_have_expected_callback() ->
-    ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
-    ?assertError(ExpectedError,
-                 mock(hoax_test_behaviour, name_of_mock, [
-                                         expect(no_such_function, [])
-                                        ])).
-
-%%%. =================================
-
-%%%' =================================
 %%%  Expected call to return value
 %%%  =================================
 
