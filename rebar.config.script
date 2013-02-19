@@ -1,18 +1,12 @@
 %% vim: ft=erlang
-REOpts = [{capture, none}],
-OtpRelease = erlang:system_info(otp_release),
-
 Eunit2_2_3 = {eunit, "2.2.3", {git, "https://github.com/asynchrony/eunit.git", {tag, "2.2.3"}}},
-case re:run(OtpRelease, "^R15", REOpts) of
-    nomatch -> CONFIG;
-    match ->
+case erlang:system_info(otp_release) of
+    "R15B01" ->
         Deps = case lists:keyfind(deps, 1, CONFIG) of
-            false ->
-                [];
-            {deps, List} when is_list(List) ->
-                List
+            false        -> [];
+            {deps, List} -> List
         end,
-        lists:keystore(deps, 1, CONFIG, {deps, [Eunit2_2_3|Deps]})
+        lists:keystore(deps, 1, CONFIG, {deps, [Eunit2_2_3|Deps]});
+    _ ->
+        CONFIG
 end.
-
-
