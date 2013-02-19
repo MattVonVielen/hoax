@@ -37,9 +37,7 @@ stub(Behaviour, ModuleName, Expectations) ->
     do_hoax(Behaviour, ModuleName, Expectations, permissive).
 
 fake(ModuleName, Expectations) ->
-    hoax_code:module_exists(ModuleName) andalso
-        error({module_exists, ModuleName}),
-    Funcs = [ element(1,X) || X <- Expectations ],
+    Funcs = hoax_code:expectation_list_to_function_list(ModuleName, Expectations),
     make_hoax(ModuleName, Funcs, Expectations, strict).
 
 expect(Func, Args) -> expect(Func, Args, and_return(ok)).
@@ -52,18 +50,11 @@ and_throw(Error) -> hoax_module:throw_error(Error).
 %%%%%%%%%%%%%
 
 do_hoax(ModuleName, Expectations, Strict) ->
-    hoax_code:module_exists(ModuleName) orelse
-        error({no_such_module_to_mock, ModuleName}),
-    make_hoax(ModuleName, hoax_code:get_exports(ModuleName), Expectations,
-              Strict).
+    Functions = hoax_code:get_function_list(ModuleName),
+    make_hoax(ModuleName, Functions, Expectations, Strict).
 
 do_hoax(Behaviour, ModuleName, Expectations, Strict) ->
-    hoax_code:module_exists(ModuleName) andalso
-        error({module_exists, ModuleName}),
-    Callbacks = case hoax_code:get_callbacks(Behaviour) of
-        {ok, List}     -> List;
-        {error, Error} -> error(Error)
-    end,
+    Callbacks = hoax_code:get_function_list(Behaviour, ModuleName),
     make_hoax(ModuleName, Callbacks, Expectations, Strict).
 
 make_hoax(ModuleName, Funcs, Expectations, Strict) ->
