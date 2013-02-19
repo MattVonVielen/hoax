@@ -60,7 +60,7 @@ function_call(Module, Function, Args) ->
 
 -spec(variables( integer() ) -> args()).
 variables(Arity) ->
-    [ erl_syntax:variable("V"++integer_to_list(Num)) || Num <- lists:seq(1,Arity) ].
+    [ erl_syntax:variable([$V|integer_to_list(Num)]) || Num <- lists:seq(1,Arity) ].
 
 -spec(m_f_args( atom(), atom(), args() ) -> erl_syntax:tree()).
 m_f_args(Module, Function, Args) ->
