@@ -1,6 +1,6 @@
 -module(hoax_module).
 
--export([compile/4, make_expectation/3, return_value/1, throw_error/1]).
+-export([compile/4]).
 
 compile(Mod, Funcs, Expects, Strict) ->
     Exports = [ {Mod, Func, Strict} || Func <- Funcs ],
@@ -11,12 +11,6 @@ compile(Mod, Funcs, Expects, Strict) ->
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
     code:load_binary(Mod, "", Bin).
-
-make_expectation(Func, Args, Action) -> {{Func,length(Args)}, Args, Action}.
-
-return_value(Value) -> [erl_syntax:abstract(Value)].
-
-throw_error(Error) -> [hoax_syntax:raise_error(erl_syntax:abstract(Error))].
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
