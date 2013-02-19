@@ -43,11 +43,11 @@ fake(ModuleName, Expectations) ->
     make_hoax(ModuleName, Funcs, Expectations, strict).
 
 expect(Func, Args) -> expect(Func, Args, and_return(ok)).
-expect(Func, Args, Action) -> hoax_ast:make_expectation(Func, Args, Action).
+expect(Func, Args, Action) -> hoax_module:make_expectation(Func, Args, Action).
 
-and_return(Value) -> hoax_ast:return_value(Value).
+and_return(Value) -> hoax_module:return_value(Value).
 
-and_throw(Error) -> hoax_ast:throw_error(Error).
+and_throw(Error) -> hoax_module:throw_error(Error).
 
 %%%%%%%%%%%%%
 
@@ -76,5 +76,5 @@ make_hoax(ModuleName, Funcs, Expectations, Strict) ->
 
     Expects = [ {ModuleName, Func, Args, Action} ||
                 {Func, Args, Action} <- Expectations ],
-    Forms = hoax_ast:module(ModuleName, Funcs, Expects, Strict),
+    Forms = hoax_module:module(ModuleName, Funcs, Expects, Strict),
     hoax_code:compile(Forms).

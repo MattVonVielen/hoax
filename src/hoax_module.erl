@@ -1,4 +1,4 @@
--module(hoax_ast).
+-module(hoax_module).
 
 -export([module/4, make_expectation/3, return_value/1, throw_error/1]).
 

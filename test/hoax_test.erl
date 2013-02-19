@@ -130,6 +130,17 @@ mock_should_return_expected_value_when_args_match() ->
 
     ?assertEqual(a_result, Result).
 
+mock_should_return_discrete_expected_values_for_appropriate_args_regardless_of_call_order() ->
+    mock(hoax_test_module, [
+                            expect(function_one,[arg1,arg2],
+                                   and_return(result_for_args_1_and_2)),
+                            expect(function_one,[arg3,arg4],
+                                   and_return(result_for_args_3_and_4))
+                           ]),
+
+    ?assertEqual(result_for_args_3_and_4, hoax_test_module:function_one(arg3, arg4)),
+    ?assertEqual(result_for_args_1_and_2, hoax_test_module:function_one(arg1, arg2)).
+
 mock_behaviour_should_return_expected_value_when_args_match() ->
     mock(hoax_test_behaviour, name_of_mock, [
                             expect(callback_one,[arg1],
