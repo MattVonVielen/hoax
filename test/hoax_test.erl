@@ -26,10 +26,6 @@ stop_should_unload_all_hoaxed_modules() ->
 %%%  Preconditions - stub
 %%%  =================================
 
-stub_should_throw_when_module_cannot_be_loaded() ->
-    ExpectedError = {no_such_module_to_mock, no_such_module},
-    ?assertError(ExpectedError, stub(no_such_module, [])).
-
 stub_should_throw_when_module_does_not_have_expected_function() ->
     ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
     ?assertError(ExpectedError,
@@ -43,18 +39,6 @@ stub_should_throw_when_module_does_not_have_expected_function() ->
 %%%  Preconditions - stub_behaviour
 %%%  =================================
 
-stub_behaviour_should_throw_when_behaviour_cannot_be_loaded() ->
-    ExpectedError = {no_such_behaviour_to_mock, no_such_module},
-    ?assertError(ExpectedError, stub(no_such_module, name_of_mock)).
-
-stub_behaviour_should_throw_when_behaviour_arg_is_not_a_behaviour() ->
-    ExpectedError = {not_a_behaviour, hoax_test_module},
-    ?assertError(ExpectedError, stub(hoax_test_module, name_of_mock)).
-
-stub_behaviour_should_throw_when_output_module_exists() ->
-    ExpectedError = {module_exists, hoax_test_module},
-    ?assertError(ExpectedError, stub(hoax_test_behaviour, hoax_test_module)).
-
 stub_behaviour_should_throw_when_behaviour_does_not_have_expected_callback() ->
     ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
     ?assertError(ExpectedError,
@@ -65,22 +49,8 @@ stub_behaviour_should_throw_when_behaviour_does_not_have_expected_callback() ->
 %%%. =================================
 
 %%%' =================================
-%%%  Preconditions - fake
-%%%  =================================
-
-fake_should_throw_when_module_exists() ->
-    ExpectedError = {module_exists, hoax_test_module},
-    ?assertError(ExpectedError, fake(hoax_test_module, [])).
-
-%%%. =================================
-
-%%%' =================================
 %%%  Preconditions - mock
 %%%  =================================
-
-mock_should_throw_when_module_cannot_be_loaded() ->
-    ExpectedError = {no_such_module_to_mock, no_such_module},
-    ?assertError(ExpectedError, mock(no_such_module, [])).
 
 mock_should_throw_when_module_does_not_have_expected_function() ->
     ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
@@ -94,18 +64,6 @@ mock_should_throw_when_module_does_not_have_expected_function() ->
 %%%' =================================
 %%%  Preconditions - mock_behaviour
 %%%  =================================
-
-mock_behaviour_should_throw_when_behaviour_cannot_be_loaded() ->
-    ExpectedError = {no_such_behaviour_to_mock, no_such_module},
-    ?assertError(ExpectedError, mock(no_such_module, name_of_mock)).
-
-mock_behaviour_should_throw_when_behaviour_arg_is_not_a_behaviour() ->
-    ExpectedError = {not_a_behaviour, hoax_test_module},
-    ?assertError(ExpectedError, mock(hoax_test_module, name_of_mock)).
-
-mock_behaviour_should_throw_when_output_module_exists() ->
-    ExpectedError = {module_exists, hoax_test_module},
-    ?assertError(ExpectedError, mock(hoax_test_behaviour, hoax_test_module)).
 
 mock_behaviour_should_throw_when_behaviour_does_not_have_expected_callback() ->
     ExpectedError = {no_such_function_to_mock, {no_such_function, 0}},
