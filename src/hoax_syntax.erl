@@ -9,7 +9,8 @@
          wildcard_clause/2,
          function_call/3,
          variables/1,
-         m_f_args/3
+         m_f_args/3,
+         raise_error/1
      ]).
 
 -type(func() :: {atom(), integer()}).
@@ -66,3 +67,7 @@ m_f_args(Module, Function, Args) ->
     M = erl_syntax:atom(Module),
     F = erl_syntax:atom(Function),
     erl_syntax:tuple([M, F, erl_syntax:list(Args)]).
+
+-spec(raise_error( term() ) -> erl_syntax:tree()).
+raise_error(Error) ->
+    function_call(erlang, error, [Error]).

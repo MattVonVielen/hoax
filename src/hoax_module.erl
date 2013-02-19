@@ -16,7 +16,7 @@ make_expectation(Func, Args, Action) -> {{Func,length(Args)}, Args, Action}.
 
 return_value(Value) -> [erl_syntax:abstract(Value)].
 
-throw_error(Error) -> [erlang_error(erl_syntax:abstract(Error))].
+throw_error(Error) -> [hoax_syntax:raise_error(erl_syntax:abstract(Error))].
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
@@ -53,12 +53,9 @@ make_unexpected_call_clause({Mod, Func = {F, A}, strict}, Dict) ->
     Clause = unexpected_call_clause(unexpected_invocation, Mod, F, A),
     dict:store(Func, [Clause], Dict).
 
-erlang_error(Error) ->
-    hoax_syntax:function_call(erlang, error, [Error]).
-
 unexpected_call_clause(Error, M, F, A) ->
     Args = hoax_syntax:variables(A),
     MFArgs = hoax_syntax:m_f_args(M, F, Args),
     Reason = erl_syntax:atom(Error),
     Exception = erl_syntax:tuple([Reason, MFArgs]),
-    erl_syntax:clause(Args, [], [erlang_error(Exception)]).
+    erl_syntax:clause(Args, [], [hoax_syntax:raise_error(Exception)]).
