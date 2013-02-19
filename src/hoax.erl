@@ -20,18 +20,14 @@ stop() ->
               hoax_srv:stop())
     end.
 
-mock(ModuleName, Expectations) when is_list(Expectations) ->
-    do_hoax(ModuleName, Expectations, strict);
-mock(Behaviour, ModuleName) when is_atom(ModuleName) ->
-    do_hoax(Behaviour, ModuleName, [], strict).
+mock(ModuleName, Expectations) ->
+    do_hoax(ModuleName, Expectations, strict).
 
 mock(Behaviour, ModuleName, Expectations) ->
     do_hoax(Behaviour, ModuleName, Expectations, strict).
 
-stub(ModuleName, Expectations) when is_list(Expectations) ->
-    do_hoax(ModuleName, Expectations, permissive);
-stub(Behaviour, ModuleName) when is_atom(ModuleName) ->
-    do_hoax(Behaviour, ModuleName, [], permissive).
+stub(ModuleName, Expectations) ->
+    do_hoax(ModuleName, Expectations, permissive).
 
 stub(Behaviour, ModuleName, Expectations) ->
     do_hoax(Behaviour, ModuleName, Expectations, permissive).
