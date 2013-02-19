@@ -10,7 +10,8 @@ compile(Mod, Funcs, Expects, Strict) ->
                              make_functions(Exports, Expects)
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
-    code:load_binary(Mod, "", Bin).
+    code:load_binary(Mod, "", Bin),
+    hoax_srv:add_mod(Mod).
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
