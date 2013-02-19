@@ -6,7 +6,6 @@
          attribute/2,
          function/2,
          exact_match_clause/2,
-         wildcard_clause/2,
          function_call/3,
          variables/1,
          m_f_args/3,
@@ -45,11 +44,6 @@ arity_qualifier({F, A}) ->
 exact_match_clause(Args, Body) ->
     AbstractArgs = [erl_syntax:abstract(Arg) || Arg <- Args],
     erl_syntax:clause(AbstractArgs, [], Body).
-
--spec(wildcard_clause( Arity::integer(), Body::[erl_syntax:tree()] ) -> clause()).
-wildcard_clause(Arity, Body) ->
-    WildcardMatch = lists:duplicate(Arity, erl_syntax:underscore()),
-    erl_syntax:clause(WildcardMatch, [], Body).
 
 -spec(function_call( atom(), atom(), args() ) -> function_call()).
 function_call(Module, Function, Args) ->

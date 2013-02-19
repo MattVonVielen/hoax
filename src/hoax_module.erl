@@ -1,9 +1,9 @@
 -module(hoax_module).
 
--export([compile/4]).
+-export([compile/3]).
 
-compile(Mod, Funcs, Expects, Strict) ->
-    Exports = [ {Mod, Func, Strict} || Func <- Funcs ],
+compile(Mod, Funcs, Expects) ->
+    Exports = [ {Mod, Func} || Func <- Funcs ],
     Forms = erl_syntax:revert_forms([
                              hoax_syntax:module_attribute(Mod),
                              hoax_syntax:export_attribute(Funcs) |
@@ -27,10 +27,12 @@ make_clauses_for_expect({Mod, Func, Args, Action}, Dict) ->
     Clause = hoax_syntax:exact_match_clause(Args, Action),
     dict:store(Func, [Clause|Clauses], Dict).
 
-make_clause_for_export(Export = {_, Func, _}, Dict) ->
+make_clause_for_export({Mod, Func = {F,A}}, Dict) ->
     case dict:find(Func, Dict) of
         {ok, _} -> Dict;
-        error   -> make_unexpected_call_clause(Export, Dict)
+        error   ->
+            Clause = unexpected_call_clause(unexpected_invocation, Mod, F, A),
+            dict:store(Func, [Clause], Dict)
     end.
 
 clauses_for_func(Mod, Func = {F, A}, Dict) ->
@@ -40,13 +42,6 @@ clauses_for_func(Mod, Func = {F, A}, Dict) ->
         {ok, Previous} ->
             Previous
     end.
-
-make_unexpected_call_clause({_, Func = {_, A}, permissive}, Dict) ->
-    Clause = hoax_syntax:wildcard_clause(A, [erl_syntax:atom(ok)]),
-    dict:store(Func, [Clause], Dict);
-make_unexpected_call_clause({Mod, Func = {F, A}, strict}, Dict) ->
-    Clause = unexpected_call_clause(unexpected_invocation, Mod, F, A),
-    dict:store(Func, [Clause], Dict).
 
 unexpected_call_clause(Error, M, F, A) ->
     Args = hoax_syntax:variables(A),

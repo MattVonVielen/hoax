@@ -23,27 +23,17 @@ stop() ->
 mock(ModuleName, Expectations) ->
     Functions = hoax_code:get_function_list(ModuleName),
     Expanded = hoax_expect:expand_expectations(ModuleName, Functions, Expectations),
-    hoax_module:compile(ModuleName, Functions, Expanded, strict).
-
-mock(Behaviour, ModuleName, Expectations) ->
-    Callbacks = hoax_code:get_function_list(Behaviour, ModuleName),
-    Expanded = hoax_expect:expand_expectations(ModuleName, Callbacks, Expectations),
-    hoax_module:compile(ModuleName, Callbacks, Expanded, strict).
-
-stub(ModuleName, Expectations) ->
-    Functions = hoax_code:get_function_list(ModuleName),
-    Expanded = hoax_expect:expand_expectations(ModuleName, Functions, Expectations),
-    hoax_module:compile(ModuleName, Functions, Expanded, permissive).
+    hoax_module:compile(ModuleName, Functions, Expanded).
 
 stub(Behaviour, ModuleName, Expectations) ->
     Callbacks = hoax_code:get_function_list(Behaviour, ModuleName),
     Expanded = hoax_expect:expand_expectations(ModuleName, Callbacks, Expectations),
-    hoax_module:compile(ModuleName, Callbacks, Expanded, permissive).
+    hoax_module:compile(ModuleName, Callbacks, Expanded).
 
 fake(ModuleName, Expectations) ->
     Funcs = hoax_code:expectation_list_to_function_list(ModuleName, Expectations),
     Expanded = hoax_expect:expand_expectations(ModuleName, Funcs, Expectations),
-    hoax_module:compile(ModuleName, Funcs, Expanded, strict).
+    hoax_module:compile(ModuleName, Funcs, Expanded).
 
 expect(Func, Args) -> expect(Func, Args, and_return(ok)).
 expect(Func, Args, Action) -> hoax_expect:make_expectation(Func, Args, Action).
