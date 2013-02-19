@@ -4,17 +4,6 @@
 
 -include_lib("eunit/include/eunit.hrl").
 
-compile_should_compile_stuff_test() ->
-    Forms = [{attribute, 0, module, hoax_test_compile}],
-
-    {module, hoax_test_compile} = hoax_code:compile(Forms),
-
-    ?assertMatch({file, _}, code:is_loaded(hoax_test_compile)),
-    Exports = hoax_test_compile:module_info(exports),
-    ?assertEqual(2, length(Exports)),
-    ?assert(lists:member({module_info,0},Exports)),
-    ?assert(lists:member({module_info,1},Exports)).
-
 module_exists_should_handle_nonexistent_module_test() ->
     ?assertNot(hoax_code:module_exists(no_such_module)).
 

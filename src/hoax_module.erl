@@ -1,14 +1,16 @@
 -module(hoax_module).
 
--export([module/4, make_expectation/3, return_value/1, throw_error/1]).
+-export([compile/4, make_expectation/3, return_value/1, throw_error/1]).
 
-module(Mod, Funcs, Expects, Strict) ->
+compile(Mod, Funcs, Expects, Strict) ->
     Exports = [ {Mod, Func, Strict} || Func <- Funcs ],
-    erl_syntax:revert_forms([
+    Forms = erl_syntax:revert_forms([
                              hoax_syntax:module_attribute(Mod),
                              hoax_syntax:export_attribute(Funcs) |
                              make_functions(Exports, Expects)
-                            ]).
+                            ]),
+    {ok, Mod, Bin} = compile:forms(Forms),
+    code:load_binary(Mod, "", Bin).
 
 make_expectation(Func, Args, Action) -> {{Func,length(Args)}, Args, Action}.
 

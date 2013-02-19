@@ -76,5 +76,4 @@ make_hoax(ModuleName, Funcs, Expectations, Strict) ->
 
     Expects = [ {ModuleName, Func, Args, Action} ||
                 {Func, Args, Action} <- Expectations ],
-    Forms = hoax_module:module(ModuleName, Funcs, Expects, Strict),
-    hoax_code:compile(Forms).
+    hoax_module:compile(ModuleName, Funcs, Expects, Strict).
