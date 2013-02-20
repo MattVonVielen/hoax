@@ -21,23 +21,17 @@ stop() ->
     end.
 
 mock(ModuleName, Expectations) ->
-    Functions = hoax_code:get_function_list(ModuleName),
-    Expanded = hoax_expect:expand_expectations(ModuleName, Functions, Expectations),
-    hoax_module:compile(ModuleName, Functions, Expanded).
+    Exports = hoax_code:get_function_list(ModuleName),
+    Functions = hoax_expect:validate(Expectations),
+    hoax_expect:assert_exported(Functions, Exports),
+    hoax_module:compile(ModuleName, Exports, Expectations).
 
 stub(Behaviour, ModuleName, Expectations) ->
     Callbacks = hoax_code:get_function_list(Behaviour, ModuleName),
-    Expanded = hoax_expect:expand_expectations(ModuleName, Callbacks, Expectations),
-    hoax_module:compile(ModuleName, Callbacks, Expanded).
+    Functions = hoax_expect:validate(Expectations),
+    hoax_expect:assert_exported(Functions, Callbacks),
+    hoax_module:compile(ModuleName, Callbacks, Expectations).
 
 fake(ModuleName, Expectations) ->
-    Funcs = hoax_code:expectation_list_to_function_list(ModuleName, Expectations),
-    Expanded = hoax_expect:expand_expectations(ModuleName, Funcs, Expectations),
-    hoax_module:compile(ModuleName, Funcs, Expanded).
-
-expect(Func, Args) -> expect(Func, Args, and_return(ok)).
-expect(Func, Args, Action) -> hoax_expect:make_expectation(Func, Args, Action).
-
-and_return(Value) -> hoax_expect:return_value(Value).
-
-and_throw(Error) -> hoax_expect:throw_error(Error).
+    Functions = hoax_expect:validate(Expectations),
+    hoax_module:compile(ModuleName, Functions, Expectations).

@@ -3,7 +3,6 @@
 -export([
         get_function_list/1,
         get_function_list/2,
-        expectation_list_to_function_list/2,
         purge_and_delete/1
     ]).
 
@@ -20,11 +19,6 @@ get_function_list(Behaviour, ModuleName) ->
     erlang:function_exported(Behaviour, behaviour_info, 1) orelse
         error({not_a_behaviour, Behaviour}),
     Behaviour:behaviour_info(callbacks).
-
-expectation_list_to_function_list(ModuleName, Expectations) ->
-    module_exists(ModuleName) andalso
-        error({module_exists, ModuleName}),
-    [ element(1,X) || X <- Expectations ].
 
 purge_and_delete(ModuleName) ->
     code:purge(ModuleName),

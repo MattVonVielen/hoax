@@ -35,14 +35,6 @@ get_function_list_should_return_callbacks_from_behaviour_test() ->
     ?assert(lists:member({callback_one,1}, Callbacks)),
     ?assert(lists:member({callback_two,2}, Callbacks)).
 
-expectation_list_to_function_list_should_throw_when_module_exists_test() ->
-    ExpectedError = {module_exists, hoax_test_module},
-    ?assertError(ExpectedError, hoax_code:expectation_list_to_function_list(hoax_test_module, [])).
-
-expectation_list_to_function_list_should_return_first_elements_of_expectation_tuples_test() ->
-    Functions = hoax_code:expectation_list_to_function_list(no_such_module, [{1}, {2}, {3}]),
-    ?assertEqual([1,2,3], Functions).
-
 purge_and_delete_should_ensure_module_no_longer_loaded_test() ->
     code:ensure_loaded(hoax_test_module),
 

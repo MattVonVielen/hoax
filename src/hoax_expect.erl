@@ -1,27 +1,27 @@
 -module(hoax_expect).
 
 -export([
-        make_expectation/3,
-        return_value/1,
-        throw_error/1,
-        expand_expectations/3
+        validate/1,
+        assert_exported/2
     ]).
 
-make_expectation(Func, Args, Action) ->
-    {{Func,length(Args)}, Args, Action}.
+validate(Expectations) ->
+    validate(Expectations, []).
 
-return_value(Value) ->
-    [erl_syntax:abstract(Value)].
+validate([{Function, Args} | Rest], Acc) when is_list(Args) ->
+    validate(Rest, [{Function, length(Args)} | Acc]);
+validate([{Function, Args, {return, _Value}} | Rest], Acc) when is_list(Args) ->
+    validate(Rest, [{Function, length(Args)} | Acc]);
+validate([{Function, Args, {throw, _Error}} | Rest], Acc) when is_list(Args) ->
+    validate(Rest, [{Function, length(Args)} | Acc]);
+validate([Other | _Rest], _Acc) ->
+    error({bad_expectation_syntax, Other});
+validate([], Acc) ->
+    Acc.
 
-throw_error(Error) ->
-    [hoax_syntax:raise_error(erl_syntax:abstract(Error))].
-
-expand_expectations(ModuleName, Funcs, Expectations) ->
-    lists:foreach(
-        fun({Func, _, _}) ->
-            lists:member(Func, Funcs) orelse
-                error({no_such_function_to_mock, Func})
-        end, Expectations),
-
-    [ {ModuleName, Func, Args, Action} ||
-        {Func, Args, Action} <- Expectations ].
+assert_exported([Function | Rest], Exports) ->
+    lists:member(Function, Exports) orelse
+        error({no_such_function_to_mock, Function}),
+    assert_exported(Rest, Exports);
+assert_exported([], _) ->
+    ok.

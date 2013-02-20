@@ -27,41 +27,28 @@ stop_should_unload_all_hoaxed_modules() ->
 %%%  =================================
 
 mock_should_return_expected_value_when_args_match() ->
-    mock(hoax_test_module, [
-                            expect(function_one,[arg1,arg2],
-                                   and_return(a_result))
-                           ]),
+    mock(hoax_test_module, [ {function_one,[arg1,arg2], {return,a_result}} ]),
 
     Result = hoax_test_module:function_one(arg1, arg2),
 
     ?assertEqual(a_result, Result).
 
 mock_should_return_discrete_expected_values_for_appropriate_args_regardless_of_call_order() ->
-    mock(hoax_test_module, [
-                            expect(function_one,[arg1,arg2],
-                                   and_return(result_for_args_1_and_2)),
-                            expect(function_one,[arg3,arg4],
-                                   and_return(result_for_args_3_and_4))
-                           ]),
+    mock(hoax_test_module, [ {function_one,[arg1,arg2], {return,result_for_args_1_and_2}},
+                             {function_one,[arg3,arg4], {return,result_for_args_3_and_4}} ]),
 
     ?assertEqual(result_for_args_3_and_4, hoax_test_module:function_one(arg3, arg4)),
     ?assertEqual(result_for_args_1_and_2, hoax_test_module:function_one(arg1, arg2)).
 
 stub_behaviour_should_return_expected_value_when_args_match() ->
-    stub(hoax_test_behaviour, name_of_mock, [
-                            expect(callback_one,[arg1],
-                                   and_return(a_result))
-                           ]),
+    stub(hoax_test_behaviour, name_of_mock, [ {callback_one,[arg1], {return,a_result}} ]),
 
     Result = name_of_mock:callback_one(arg1),
 
     ?assertEqual(a_result, Result).
 
 fake_should_return_expected_value_when_args_match() ->
-    fake(no_such_module, [
-                          expect(no_such_function,[arg1,arg2],
-                                 and_return(a_result))
-                         ]),
+    fake(no_such_module, [ {no_such_function,[arg1,arg2], {return,a_result}} ]),
 
     Result = no_such_module:no_such_function(arg1, arg2),
 
@@ -74,28 +61,19 @@ fake_should_return_expected_value_when_args_match() ->
 %%%  =================================
 
 mock_should_throw_expected_value_when_args_match() ->
-    mock(hoax_test_module, [
-                            expect(function_one,[arg1,arg2],
-                                   and_throw(an_error))
-                           ]),
+    mock(hoax_test_module, [ {function_one,[arg1,arg2], {throw,an_error}} ]),
 
     ?assertError(an_error,
                  hoax_test_module:function_one(arg1, arg2)).
 
 stub_behaviour_should_throw_expected_value_when_args_match() ->
-    stub(hoax_test_behaviour, name_of_mock, [
-                            expect(callback_one,[arg1],
-                                   and_throw(an_error))
-                           ]),
+    stub(hoax_test_behaviour, name_of_mock, [ {callback_one,[arg1], {throw,an_error}} ]),
 
     ?assertError(an_error,
                  name_of_mock:callback_one(arg1)).
 
 fake_should_throw_expected_value_when_args_match() ->
-    fake(no_such_module, [
-                          expect(no_such_function,[arg1,arg2],
-                                 and_throw(an_error))
-                         ]),
+    fake(no_such_module, [ {no_such_function,[arg1,arg2], {throw,an_error}} ]),
 
     ?assertError(an_error,
                  no_such_module:no_such_function(arg1, arg2)).
@@ -107,26 +85,20 @@ fake_should_throw_expected_value_when_args_match() ->
 %%%  =================================
 
 mock_should_throw_when_args_do_not_match() ->
-    mock(hoax_test_module, [
-                            expect(function_one,[arg1,arg2],
-                                   and_return(a_result))
-                           ]),
+    mock(hoax_test_module, [ {function_one,[arg1,arg2], {return,a_result}} ]),
 
     ExpectedError = {unexpected_arguments, {hoax_test_module,
             function_one, [arg1, not_matching_arg]}},
     ?assertError(ExpectedError, hoax_test_module:function_one(arg1, not_matching_arg)).
 
 stub_behaviour_should_throw_when_args_do_not_match() ->
-    stub(hoax_test_behaviour, name_of_mock, [
-                            expect(callback_one,[arg1],
-                                   and_return(a_result))
-                           ]),
+    stub(hoax_test_behaviour, name_of_mock, [ {callback_one,[arg1], {return,a_result}} ]),
 
     ExpectedError = {unexpected_arguments, {name_of_mock, callback_one, [not_matching_arg]}},
     ?assertError(ExpectedError, name_of_mock:callback_one(not_matching_arg)).
 
 fake_should_throw_when_args_do_not_match() ->
-    fake(no_such_module, [expect(no_such_function,[arg1,arg2], and_return(a_result))]),
+    fake(no_such_module, [{no_such_function,[arg1,arg2], {return,a_result}}]),
 
     ExpectedError = {unexpected_arguments, {no_such_module, no_such_function, [arg1, not_matching_arg]}},
     ?assertError(ExpectedError, no_such_module:no_such_function(arg1, not_matching_arg)).
@@ -138,10 +110,7 @@ fake_should_throw_when_args_do_not_match() ->
 %%%  =================================
 
 mock_should_throw_when_unexpected_call() ->
-    mock(hoax_test_module, [
-                            expect(function_one,[arg1,arg2],
-                                   and_return(a_result))
-                           ]),
+    mock(hoax_test_module, [ {function_one,[arg1,arg2], {return,a_result}} ]),
 
     ExpectedError = {unexpected_invocation, {hoax_test_module, function_two, [arg1]}},
     ?assertError(ExpectedError, hoax_test_module:function_two(arg1)).

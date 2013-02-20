@@ -3,10 +3,6 @@
         stop/0,
         mock/2,
         stub/3,
-        fake/2,
-        expect/2,
-        expect/3,
-        and_return/1,
-        and_throw/1
+        fake/2
     ]).
 

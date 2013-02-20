@@ -2,8 +2,21 @@
 
 -export([compile/3]).
 
-compile(Mod, Funcs, Expects) ->
+transform_expectations(Mod, [{Function, Args} | Rest], Acc) ->
+    E = {Mod, {Function, length(Args)}, Args, [erl_syntax:abstract('$_hoax_default_return_$')]},
+    transform_expectations(Mod, Rest, [E|Acc]);
+transform_expectations(Mod, [{Function, Args, {return, Value}} | Rest], Acc) ->
+    E = {Mod, {Function, length(Args)}, Args, [erl_syntax:abstract(Value)]},
+    transform_expectations(Mod, Rest, [E|Acc]);
+transform_expectations(Mod, [{Function, Args, {throw, Error}} | Rest], Acc) ->
+    E = {Mod, {Function, length(Args)}, Args, [hoax_syntax:raise_error(erl_syntax:abstract(Error))]},
+    transform_expectations(Mod, Rest, [E|Acc]);
+transform_expectations(_Mod, [], Acc) ->
+    Acc.
+
+compile(Mod, Funcs, Expectations) ->
     Exports = [ {Mod, Func} || Func <- Funcs ],
+    Expects = transform_expectations(Mod, Expectations, []),
     Forms = erl_syntax:revert_forms([
                              hoax_syntax:module_attribute(Mod),
                              hoax_syntax:export_attribute(Funcs) |
