@@ -5,9 +5,9 @@
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("hoax/include/hoax.hrl").
 
-?HOAX_FIXTURE.
+stop_should_unload_all_hoaxed_modules_test() ->
+    start(),
 
-stop_should_unload_all_hoaxed_modules() ->
     fake(no_such_module, []),
     mock(hoax_test_module, []),
 

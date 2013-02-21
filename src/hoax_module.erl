@@ -3,13 +3,13 @@
 -export([compile/3]).
 
 transform_expectations(Mod, [{Function, Args} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, [erl_syntax:abstract('$_hoax_default_return_$')]},
+    E = {Mod, {Function, length(Args)}, Args, erl_syntax:abstract('$_hoax_default_return_$')},
     transform_expectations(Mod, Rest, [E|Acc]);
 transform_expectations(Mod, [{Function, Args, {return, Value}} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, [erl_syntax:abstract(Value)]},
+    E = {Mod, {Function, length(Args)}, Args, erl_syntax:abstract(Value)},
     transform_expectations(Mod, Rest, [E|Acc]);
 transform_expectations(Mod, [{Function, Args, {throw, Error}} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, [hoax_syntax:raise_error(erl_syntax:abstract(Error))]},
+    E = {Mod, {Function, length(Args)}, Args, hoax_syntax:raise_error(erl_syntax:abstract(Error))},
     transform_expectations(Mod, Rest, [E|Acc]);
 transform_expectations(_Mod, [], Acc) ->
     Acc.
@@ -24,7 +24,7 @@ compile(Mod, Funcs, Expectations) ->
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
     code:load_binary(Mod, "", Bin),
-    hoax_srv:add_mod(Mod).
+    hoax_tab:init_mod(Mod).
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
@@ -35,9 +35,13 @@ make_functions(Exports, Expects) ->
 make_function({F,_}, Clauses, Functions) ->
     [ hoax_syntax:function(F, Clauses) | Functions ].
 
-make_clauses_for_expect({Mod, Func, Args, Action}, Dict) ->
+make_clauses_for_expect({Mod, {F,_} = Func, Args, Action}, Dict) ->
+    hoax_tab:init_expect(Mod, F, Args),
     Clauses = clauses_for_func(Mod, Func, Dict),
-    Clause = hoax_syntax:exact_match_clause(Args, Action),
+    RecordCall = hoax_syntax:function_call(hoax_tab, record_call, [
+            erl_syntax:atom(Mod), erl_syntax:atom(F), erl_syntax:abstract(Args)
+        ]),
+    Clause = hoax_syntax:exact_match_clause(Args, [RecordCall,Action]),
     dict:store(Func, [Clause|Clauses], Dict).
 
 make_clause_for_export({Mod, Func = {F,A}}, Dict) ->

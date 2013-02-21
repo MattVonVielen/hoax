@@ -9,16 +9,12 @@
 %% ===================================================================
 
 start() ->
-    hoax_srv:start().
+    hoax_tab:create().
 
 stop() ->
-    case erlang:whereis(hoax_srv) of
-        undefined -> ok;
-        _ ->
-            lists:foreach(
-              fun hoax_code:purge_and_delete/1,
-              hoax_srv:stop())
-    end.
+    lists:foreach(
+        fun hoax_code:purge_and_delete/1,
+        hoax_tab:delete()).
 
 mock(ModuleName, Expectations) ->
     Exports = hoax_code:get_function_list(ModuleName),
