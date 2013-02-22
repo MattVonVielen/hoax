@@ -41,3 +41,14 @@
         ?HF_TEST_DECL_WITH_ARG)
 ).
 
+-define(verifyAll,
+    ((fun () ->
+                    case (hoax_tab:unmet_expectations()) of
+                        []  -> ok;
+                        Unmet -> .erlang:error({unmet_expectations,
+                                [{module, ?MODULE},
+                                    {line, ?LINE},
+                                    {expected, Unmet}
+                                ]})
+                end
+        end)())).

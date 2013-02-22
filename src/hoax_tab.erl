@@ -20,3 +20,6 @@ delete() ->
     Mods = qlc:e(qlc:q([ M || {{mods,M}} <- ets:table(hoax) ])),
     ets:delete(hoax),
     Mods.
+
+unmet_expectations() ->
+    qlc:e(qlc:q([ Call || {{calls,Call},0} <- ets:table(hoax) ])).
