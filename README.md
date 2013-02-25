@@ -6,8 +6,6 @@ hoax
 ====
 Yet another mocking library for Erlang.
 
-<a name='build'>
-
 Build
 -----
 
@@ -23,6 +21,8 @@ To make sure hoax works on your platform, run the tests:
 ```sh
 rebar eunit
 ```
+
+_Note that hoax's unit tests require Eunit >= 2.2.1 (OTP R14B04)._
 
   [1]: https://github.com/basho/rebar "Rebar - A build tool for Erlang"
 
