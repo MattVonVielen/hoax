@@ -20,12 +20,19 @@ get_function_list(Behaviour, ModuleName) ->
         error({not_a_behaviour, Behaviour}),
     Behaviour:behaviour_info(callbacks).
 
-purge_and_delete(ModuleName) ->
+purge_and_delete({ModuleName, Sticky}) ->
     code:purge(ModuleName),
-    code:delete(ModuleName).
+    code:delete(ModuleName),
+    code:ensure_loaded(ModuleName),
+    restore_stickiness(ModuleName, Sticky).
 
 module_exists(ModuleName) ->
     case code:ensure_loaded(ModuleName) of
         {error, nofile} -> false;
         {module, ModuleName} -> true
     end.
+
+restore_stickiness(ModuleName, true) ->
+    code:stick_mod(ModuleName);
+restore_stickiness(_, _) ->
+    ok.

@@ -35,9 +35,11 @@ get_function_list_should_return_callbacks_from_behaviour_test() ->
     ?assert(lists:member({callback_one,1}, Callbacks)),
     ?assert(lists:member({callback_two,2}, Callbacks)).
 
-purge_and_delete_should_ensure_module_no_longer_loaded_test() ->
+purge_and_delete_should_ensure_module_no_longer_loaded_and_restore_stickiness_test() ->
     code:ensure_loaded(hoax_test_module),
+    code:stick_mod(hoax_test_module),
 
-    hoax_code:purge_and_delete(hoax_test_module),
+    hoax_code:purge_and_delete({hoax_test_module, true}),
 
-    ?assertEqual(false, code:is_loaded(hoax_test_module)).
+    ?assertMatch({file, _}, code:is_loaded(hoax_test_module)),
+    ?assert(code:is_sticky(hoax_test_module)).

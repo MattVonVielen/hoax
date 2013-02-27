@@ -23,8 +23,9 @@ compile(Mod, Funcs, Expectations) ->
                              make_functions(Exports, Expects)
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
-    code:load_binary(Mod, "", Bin),
-    hoax_tab:init_mod(Mod).
+    hoax_tab:init_mod(Mod, code:is_sticky(Mod)),
+    code:unstick_mod(Mod),
+    code:load_binary(Mod, "", Bin).
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
