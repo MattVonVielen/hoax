@@ -1,17 +1,20 @@
 -module(hoax_code).
 
 -export([
-        get_function_list/1,
-        get_function_list/2,
+        get_export_list/2,
+        get_callback_list/2,
         purge_and_delete/1
     ]).
 
-get_function_list(ModuleName) ->
-    module_exists(ModuleName) orelse
-        error({no_such_module_to_mock, ModuleName}),
-    [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info].
+get_export_list(ModuleName, ExpectedFunctions) ->
+    case module_exists(ModuleName) of
+        true ->
+            [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info];
+        false ->
+            ExpectedFunctions
+    end.
 
-get_function_list(Behaviour, ModuleName) ->
+get_callback_list(Behaviour, ModuleName) ->
     module_exists(ModuleName) andalso
         error({module_exists, ModuleName}),
     module_exists(Behaviour) orelse

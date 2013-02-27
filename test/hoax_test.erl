@@ -7,15 +7,15 @@
 
 stop_should_unload_all_hoaxed_modules_test() ->
     ExpectedResult = hoax_test_module:function_one(1, 2),
-    start(),
+    hoax:start(),
 
     try
-        fake(no_such_module, []),
+        mock(no_such_module, []),
         mock(hoax_test_module, [{function_one, [1, 2], {return, mocked_return_value}}]),
 
         ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))
     after
-        stop()
+        hoax:stop()
     end,
 
     Result = hoax_test_module:function_one(1, 2),
@@ -26,14 +26,14 @@ stop_should_unload_all_hoaxed_modules_test() ->
 should_be_able_to_mock_sticky_modules_test() ->
     code:stick_mod(hoax_test_module),
     try
-        start(),
+        hoax:start(),
 
         try
             mock(hoax_test_module, [{function_one, [1, 2], {return, mocked_return_value}}]),
             ?assertNot(code:is_sticky(hoax_test_module)),
             ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))
         after
-            stop()
+            hoax:stop()
         end,
 
         ?assert(code:is_sticky(hoax_test_module))
