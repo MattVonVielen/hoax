@@ -52,3 +52,9 @@
                                 ]})
                 end
         end)())).
+
+-define(expect(Func, Args), {Func, Args}).
+-define(expect(Func, Args, Action), {Func, Args, Action}).
+-define(withArgs(Args), Args).
+-define(andReturn(Val), {return, Val}).
+-define(andThrow(Val), {throw, Val}).
