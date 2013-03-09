@@ -58,3 +58,5 @@
 -define(withArgs(Args), Args).
 -define(andReturn(Val), {return, Val}).
 -define(andThrow(Val), {throw, Val}).
+-define(andError(Val), {error, Val}).
+-define(andExit(Val), {exit, Val}).

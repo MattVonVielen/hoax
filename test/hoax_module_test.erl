@@ -26,7 +26,17 @@ should_return_discrete_expected_values_for_appropriate_args_regardless_of_call_o
 should_throw_expected_value_when_args_match() ->
     hoax_module:compile(m, ?EXPORTS, [ {f,[1,2], {throw,an_error}} ]),
 
+    ?assertThrow(an_error, m:f(1, 2)).
+
+should_raise_expected_error_when_args_match() ->
+    hoax_module:compile(m, ?EXPORTS, [ {f,[1,2], {error,an_error}} ]),
+
     ?assertError(an_error, m:f(1, 2)).
+
+should_exit_with_expected_error_when_args_match() ->
+    hoax_module:compile(m, ?EXPORTS, [ {f,[1,2], {exit,an_error}} ]),
+
+    ?assertExit(an_error, m:f(1, 2)).
 
 should_throw_when_args_do_not_match() ->
     hoax_module:compile(m, ?EXPORTS, [ {f,[1,2], {return,a_result}} ]),

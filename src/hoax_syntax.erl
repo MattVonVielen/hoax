@@ -9,7 +9,7 @@
          function_call/3,
          variables/1,
          m_f_args/3,
-         raise_error/1
+         raise/2
      ]).
 
 -type(func() :: {atom(), integer()}).
@@ -18,6 +18,7 @@
 -type(function_def() :: erl_syntax:tree()).
 -type(function_call() :: erl_syntax:tree()).
 -type(args() :: [erl_syntax:tree()]).
+-type(exception_class() :: error | exit | throw).
 
 -spec(module_attribute( atom() ) -> attribute()).
 module_attribute(Name) ->
@@ -62,6 +63,6 @@ m_f_args(Module, Function, Args) ->
     F = erl_syntax:atom(Function),
     erl_syntax:tuple([M, F, erl_syntax:list(Args)]).
 
--spec(raise_error( term() ) -> erl_syntax:tree()).
-raise_error(Error) ->
-    function_call(erlang, error, [Error]).
+-spec(raise( exception_class(), term() ) -> erl_syntax:tree()).
+raise(Class, Error) ->
+    function_call(erlang, Class, [Error]).

@@ -8,8 +8,8 @@ transform_expectations(Mod, [{Function, Args} | Rest], Acc) ->
 transform_expectations(Mod, [{Function, Args, {return, Value}} | Rest], Acc) ->
     E = {Mod, {Function, length(Args)}, Args, erl_syntax:abstract(Value)},
     transform_expectations(Mod, Rest, [E|Acc]);
-transform_expectations(Mod, [{Function, Args, {throw, Error}} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, hoax_syntax:raise_error(erl_syntax:abstract(Error))},
+transform_expectations(Mod, [{Function, Args, {Error, Value}} | Rest], Acc) ->
+    E = {Mod, {Function, length(Args)}, Args, hoax_syntax:raise(Error, erl_syntax:abstract(Value))},
     transform_expectations(Mod, Rest, [E|Acc]);
 transform_expectations(_Mod, [], Acc) ->
     Acc.
@@ -66,4 +66,4 @@ unexpected_call_clause(Error, M, F, A) ->
     MFArgs = hoax_syntax:m_f_args(M, F, Args),
     Reason = erl_syntax:atom(Error),
     Exception = erl_syntax:tuple([Reason, MFArgs]),
-    erl_syntax:clause(Args, [], [hoax_syntax:raise_error(Exception)]).
+    erl_syntax:clause(Args, [], [hoax_syntax:raise(error, Exception)]).
