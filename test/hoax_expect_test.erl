@@ -1,22 +1,36 @@
 -module(hoax_expect_test).
 
 -compile([export_all]).
+
 -include_lib("eunit/include/eunit.hrl").
 
 validate_should_allow_no_action_given_test() ->
     Expectation = {function_0, []},
     [Result] = hoax_expect:validate([Expectation]),
-    ?assertEqual({function_0,0}, Result).
+    ?assertEqual({function_0, 0}, Result).
 
 validate_should_allow_return_action_test() ->
     Expectation = {function_1, [arg1], {return, some_value}},
     [Result] = hoax_expect:validate([Expectation]),
-    ?assertEqual({function_1,1}, Result).
+    ?assertEqual({function_1, 1}, Result).
 
 validate_should_allow_throw_action_test() ->
-    Expectation = {function_2, [arg1,arg2], {throw, some_error}},
+    Expectation = {function_2, [arg1, arg2],
+		   {throw, some_error}},
     [Result] = hoax_expect:validate([Expectation]),
-    ?assertEqual({function_2,2}, Result).
+    ?assertEqual({function_2, 2}, Result).
+
+validate_should_allow_error_action_test() ->
+    Expectation = {function_2, [arg1, arg2],
+		   {error, some_error}},
+    [Result] = hoax_expect:validate([Expectation]),
+    ?assertEqual({function_2, 2}, Result).
+
+validate_should_allow_exit_action_test() ->
+    Expectation = {function_2, [arg1, arg2],
+		   {exit, some_error}},
+    [Result] = hoax_expect:validate([Expectation]),
+    ?assertEqual({function_2, 2}, Result).
 
 validate_should_throw_when_args_not_a_list_test() ->
     Expectation = {function_0, not_a_list},
