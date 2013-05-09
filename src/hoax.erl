@@ -17,6 +17,8 @@ stop() ->
         fun hoax_code:purge_and_delete/1,
         hoax_tab:delete()).
 
+mock(ModuleName, Expectation) when is_tuple(Expectation) ->
+    mock(ModuleName, [Expectation]);
 mock(ModuleName, Expectations) ->
     Functions = hoax_expect:validate(Expectations),
     Exports = hoax_code:get_export_list(ModuleName, Functions),
