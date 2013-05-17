@@ -3,13 +3,10 @@
 -export([compile/3]).
 
 transform_expectations(Mod, [{Function, Args} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, erl_syntax:abstract('$_hoax_default_return_$')},
+    E = {Mod, {Function, length(Args)}, Args, default},
     transform_expectations(Mod, Rest, [E|Acc]);
-transform_expectations(Mod, [{Function, Args, {return, Value}} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, erl_syntax:abstract(Value)},
-    transform_expectations(Mod, Rest, [E|Acc]);
-transform_expectations(Mod, [{Function, Args, {Error, Value}} | Rest], Acc) ->
-    E = {Mod, {Function, length(Args)}, Args, hoax_syntax:raise(Error, erl_syntax:abstract(Value))},
+transform_expectations(Mod, [{Function, Args, Action} | Rest], Acc) ->
+    E = {Mod, {Function, length(Args)}, Args, Action},
     transform_expectations(Mod, Rest, [E|Acc]);
 transform_expectations(_Mod, [], Acc) ->
     Acc.
@@ -42,7 +39,7 @@ make_clauses_for_expect({Mod, {F,_} = Func, Args, Action}, Dict) ->
     RecordCall = hoax_syntax:function_call(hoax_tab, record_call, [
             erl_syntax:atom(Mod), erl_syntax:atom(F), erl_syntax:abstract(Args)
         ]),
-    Clause = hoax_syntax:exact_match_clause(Args, [RecordCall,Action]),
+    Clause = hoax_syntax:exact_match_clause(Args, [RecordCall, action_to_ast(Action)]),
     dict:store(Func, [Clause|Clauses], Dict).
 
 make_clause_for_export({Mod, Func = {F,A}}, Dict) ->
@@ -60,6 +57,13 @@ clauses_for_func(Mod, Func = {F, A}, Dict) ->
         {ok, Previous} ->
             Previous
     end.
+
+action_to_ast(default) ->
+    erl_syntax:abstract('$_hoax_default_return_$');
+action_to_ast({return, Value}) ->
+    erl_syntax:abstract(Value);
+action_to_ast({Error, Value}) ->
+    hoax_syntax:raise(Error, erl_syntax:abstract(Value)).
 
 unexpected_call_clause(Error, M, F, A) ->
     Args = hoax_syntax:variables(A),
