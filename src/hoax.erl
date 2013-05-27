@@ -1,9 +1,8 @@
 -module(hoax).
 
--include("hoax_api.hrl").
 -export([start/0, stop/0]).
--export(?HOAX_API).
--ignore_xref(?HOAX_API).
+-export([mock/2, stub/3]).
+-ignore_xref([mock/2, stub/3]).
 
 %% ===================================================================
 %% hoax API

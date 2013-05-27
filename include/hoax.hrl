@@ -1,5 +1,4 @@
--include_lib("hoax/include/hoax_api.hrl").
--import(hoax, ?HOAX_API).
+-import(hoax, [mock/2, stub/3]).
 
 -define(HF_NAME, hoax_fixture_test_).
 -define(HF_EMPTY_SETUP, fun() -> ok end).
