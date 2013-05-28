@@ -3,8 +3,9 @@
 -compile([export_all]).
 
 -include_lib("stdlib/include/qlc.hrl").
+-include("hoax_int.hrl").
 
-init_expect(M,F,Args) ->
+init_expect(#expectation{module = M, function = F, args = Args}) ->
     ets:insert(hoax, {{calls,{M,F,Args}},0}).
 
 record_call(M,F,Args) ->
