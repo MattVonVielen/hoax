@@ -4,24 +4,12 @@
 
 -include("hoax_int.hrl").
 
-expectation(Mod, {Function, Args}) ->
-    expectation(Mod, {Function, Args, default});
-expectation(Mod, {Function, Args, Action}) ->
-    #expectation{
-        module   = Mod,
-        function = Function,
-        arity    = length(Args),
-        args     = Args,
-        action   = Action
-    }.
-
 compile(Mod, Funcs, Expectations) ->
     Exports = [ {Mod, Func} || Func <- Funcs ],
-    Expects = [ expectation(Mod, Clause) || Clause <- Expectations ],
     Forms = erl_syntax:revert_forms([
                              hoax_syntax:module_attribute(Mod),
                              hoax_syntax:export_attribute(Funcs) |
-                             make_functions(Exports, Expects)
+                             make_functions(Exports, Expectations)
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
     hoax_tab:init_mod(Mod, code:is_sticky(Mod)),

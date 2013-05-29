@@ -19,13 +19,13 @@ stop() ->
 mock(ModuleName, Expectation) when is_tuple(Expectation) ->
     mock(ModuleName, [Expectation]);
 mock(ModuleName, Expectations) ->
-    Functions = hoax_expect:validate(Expectations),
-    Exports = hoax_code:get_export_list(ModuleName, Functions),
-    hoax_expect:assert_exported(Functions, Exports),
-    hoax_module:compile(ModuleName, Functions, Expectations).
+    Records = hoax_expect:parse(ModuleName, Expectations),
+    Exports = hoax_code:get_export_list(ModuleName, Records),
+    hoax_expect:assert_exported(Records, Exports),
+    hoax_module:compile(ModuleName, Exports, Records).
 
 stub(Behaviour, ModuleName, Expectations) ->
+    Records = hoax_expect:parse(ModuleName, Expectations),
     Callbacks = hoax_code:get_callback_list(Behaviour, ModuleName),
-    Functions = hoax_expect:validate(Expectations),
-    hoax_expect:assert_exported(Functions, Callbacks),
-    hoax_module:compile(ModuleName, Callbacks, Expectations).
+    hoax_expect:assert_exported(Records, Callbacks),
+    hoax_module:compile(ModuleName, Callbacks, Records).
