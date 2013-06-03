@@ -17,7 +17,6 @@ create() ->
 delete() ->
     Mods = qlc:e(qlc:q([ M || #expectation{key = {M,_,_}} <- ets:table(hoax) ], [unique])),
     ets:delete(hoax),
-    io:format("~p", [Mods]),
     Mods.
 
 unmet_expectations() ->
