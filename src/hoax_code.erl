@@ -25,7 +25,8 @@ get_callback_list(Behaviour, ModuleName) ->
         error({not_a_behaviour, Behaviour}),
     Behaviour:behaviour_info(callbacks).
 
-purge_and_delete({ModuleName, Sticky}) ->
+purge_and_delete(ModuleName) ->
+    Sticky = code:is_sticky(ModuleName),
     code:purge(ModuleName),
     code:delete(ModuleName),
     code:ensure_loaded(ModuleName),

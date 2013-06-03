@@ -45,7 +45,7 @@ purge_and_delete_should_ensure_module_no_longer_loaded_and_restore_stickiness_te
     code:ensure_loaded(hoax_test_module),
     code:stick_mod(hoax_test_module),
 
-    hoax_code:purge_and_delete({hoax_test_module, true}),
+    hoax_code:purge_and_delete(hoax_test_module),
 
     ?assertMatch({file, _}, code:is_loaded(hoax_test_module)),
     ?assert(code:is_sticky(hoax_test_module)).

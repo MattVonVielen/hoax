@@ -10,8 +10,8 @@ stop_should_unload_all_hoaxed_modules_test() ->
     hoax:start(),
 
     try
-        mock(no_such_module, []),
-        mock(hoax_test_module, [{function_one, [1, 2], {return, mocked_return_value}}]),
+        mock(no_such_module, ?expect(foo, ?withArgs([]))),
+        mock(hoax_test_module, ?expect(function_one, ?withArgs([1, 2]), ?andReturn(mocked_return_value))),
 
         ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))
     after
@@ -24,18 +24,20 @@ stop_should_unload_all_hoaxed_modules_test() ->
     ?assertMatch({error,nofile}, code:ensure_loaded(no_such_module)).
 
 should_be_able_to_mock_sticky_modules_test() ->
+    ExpectedResult = hoax_test_module:function_one(1, 2),
     code:stick_mod(hoax_test_module),
     try
         hoax:start(),
 
         try
-            mock(hoax_test_module, [{function_one, [1, 2], {return, mocked_return_value}}]),
-            ?assertNot(code:is_sticky(hoax_test_module)),
-            ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))
+            mock(hoax_test_module, ?expect(function_one, ?withArgs([1, 2]), ?andReturn(mocked_return_value))),
+            ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2)),
+            ?assert(code:is_sticky(hoax_test_module))
         after
             hoax:stop()
         end,
-
+        Result = hoax_test_module:function_one(1, 2),
+        ?assertEqual(ExpectedResult, Result),
         ?assert(code:is_sticky(hoax_test_module))
     after
         code:unstick_mod(hoax_test_module)

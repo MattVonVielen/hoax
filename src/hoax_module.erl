@@ -5,6 +5,7 @@
 -include("hoax_int.hrl").
 
 compile(Mod, Funcs, Expectations) ->
+    Sticky = code:is_sticky(Mod),
     Exports = [ {Mod, Func} || Func <- Funcs ],
     Forms = erl_syntax:revert_forms([
                              hoax_syntax:module_attribute(Mod),
@@ -12,9 +13,9 @@ compile(Mod, Funcs, Expectations) ->
                              make_functions(Exports, Expectations)
                             ]),
     {ok, Mod, Bin} = compile:forms(Forms),
-    hoax_tab:init_mod(Mod, code:is_sticky(Mod)),
     code:unstick_mod(Mod),
-    code:load_binary(Mod, "", Bin).
+    code:load_binary(Mod, "", Bin),
+    Sticky andalso code:stick_mod(Mod).
 
 make_functions(Exports, Expects) ->
     Dict0 = lists:foldl(fun make_clauses_for_expect/2, dict:new(),
