@@ -7,9 +7,9 @@
 
 -include("hoax_int.hrl").
 
-assert_exported([#expectation{function = F, arity = A} | Rest], Exports) ->
-    lists:member({F, A}, Exports) orelse
-        error({no_such_function_to_mock, {F, A}}),
+assert_exported([#expectation{key = {_, F, A}} | Rest], Exports) ->
+    lists:member({F, length(A)}, Exports) orelse
+        error({no_such_function_to_mock, {F, length(A)}}),
     assert_exported(Rest, Exports);
 assert_exported([], _) ->
     ok.
@@ -31,9 +31,6 @@ expectation(_, Other) ->
 
 expectation(Mod, Function, Args, Action) ->
     #expectation{
-        module   = Mod,
-        function = Function,
-        arity    = length(Args),
-        args     = Args,
-        action   = Action
+        key    = {Mod, Function, Args},
+        action = Action
     }.

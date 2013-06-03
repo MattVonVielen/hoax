@@ -1,10 +1,9 @@
 -type error_class() :: error | exit | throw.
 -type action()      :: default | {return, term()} | {error_class(), term()}.
+-type m_f_args()    :: { Module::atom(), Function::atom(), Args::[term()] }.
 
 -record(expectation, {
-        module   :: atom(),
-        function :: atom(),
-        arity    :: non_neg_integer(),
-        args     :: [term()],
-        action   :: action()
+        key            :: m_f_args(),
+        action         :: action(),
+        call_count = 0 :: integer()
     }).

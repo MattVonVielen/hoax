@@ -7,10 +7,7 @@
 
 assert_exported_should_throw_when_function_not_in_list_test() ->
     Expectation = #expectation{
-        module = test_mod,
-        function = function_0,
-        arity = 0,
-        args = [],
+        key = {test_mod, function_0, []},
         action = default
     },
     Exports = [{function_1, 1}],
@@ -20,10 +17,7 @@ assert_exported_should_throw_when_function_not_in_list_test() ->
 
 assert_exported_should_return_when_function_in_list_test() ->
     Expectation = #expectation{
-        module = test_mod,
-        function = function_0,
-        arity = 0,
-        args = [],
+        key = {test_mod, function_0, []},
         action = default
     },
     Exports = [{function_0, 0}, {function_1, 1}],
@@ -33,10 +27,7 @@ parse_should_allow_no_action_given_test() ->
     Expectation = {function_0, []},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{
-        module = test_mod,
-        function = function_0,
-        arity = 0,
-        args = [],
+        key = {test_mod, function_0, []},
         action = default
     },
     ?assertEqual(ExpectedOutput, Result).
@@ -45,10 +36,7 @@ parse_should_allow_return_action_test() ->
     Expectation = {function_1, [arg1], {return, some_value}},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{
-        module = test_mod,
-        function = function_1,
-        arity = 1,
-        args = [arg1],
+        key = {test_mod, function_1, [arg1]},
         action = {return, some_value}
     },
     ?assertEqual(ExpectedOutput, Result).
@@ -58,10 +46,7 @@ parse_should_allow_throw_action_test() ->
 		   {throw, some_error}},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{
-        module = test_mod,
-        function = function_2,
-        arity = 2,
-        args = [arg1, arg2],
+        key = {test_mod, function_2, [arg1, arg2]},
         action = {throw, some_error}
     },
     ?assertEqual(ExpectedOutput, Result).
@@ -71,10 +56,7 @@ parse_should_allow_error_action_test() ->
 		   {error, some_error}},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{
-        module = test_mod,
-        function = function_2,
-        arity = 2,
-        args = [arg1, arg2],
+        key = {test_mod, function_2, [arg1, arg2]},
         action = {error, some_error}
     },
     ?assertEqual(ExpectedOutput, Result).
@@ -84,10 +66,7 @@ parse_should_allow_exit_action_test() ->
 		   {exit, some_error}},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{
-        module = test_mod,
-        function = function_2,
-        arity = 2,
-        args = [arg1, arg2],
+        key = {test_mod, function_2, [arg1, arg2]},
         action = {exit, some_error}
     },
     ?assertEqual(ExpectedOutput, Result).

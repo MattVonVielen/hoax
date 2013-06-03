@@ -25,11 +25,11 @@ make_functions(Exports, Expects) ->
 make_function({F,_}, Clauses, Functions) ->
     [ hoax_syntax:function(F, Clauses) | Functions ].
 
-make_clauses_for_expect(Expect = #expectation{function = F, arity = A}, Dict) ->
+make_clauses_for_expect(Expect = #expectation{key = {_, F, A}}, Dict) ->
     hoax_tab:init_expect(Expect),
     Clauses = clauses_for_func(Expect, Dict),
-    Clause = hoax_syntax:exact_match_clause(Expect#expectation.args, [record_call(Expect), action_to_ast(Expect)]),
-    dict:store({F, A}, [Clause|Clauses], Dict).
+    Clause = hoax_syntax:exact_match_clause(A, [record_call(Expect), action_to_ast(Expect)]),
+    dict:store({F, length(A)}, [Clause|Clauses], Dict).
 
 make_clause_for_export({Mod, Func = {F,A}}, Dict) ->
     case dict:find(Func, Dict) of
@@ -39,15 +39,15 @@ make_clause_for_export({Mod, Func = {F,A}}, Dict) ->
             dict:store(Func, [Clause], Dict)
     end.
 
-clauses_for_func(#expectation{module = M, function = F, arity = A}, Dict) ->
-    case dict:find({F, A}, Dict) of
+clauses_for_func(#expectation{key = {M, F, A}}, Dict) ->
+    case dict:find({F, length(A)}, Dict) of
         error ->
-            [unexpected_call_clause(unexpected_arguments, M, F, A)];
+            [unexpected_call_clause(unexpected_arguments, M, F, length(A))];
         {ok, Previous} ->
             Previous
     end.
 
-record_call(#expectation{module = Mod, function = F, args = Args}) ->
+record_call(#expectation{key = {Mod, F, Args}}) ->
     hoax_syntax:function_call(hoax_tab, record_call, [
             erl_syntax:atom(Mod), erl_syntax:atom(F), erl_syntax:abstract(Args)
         ]).

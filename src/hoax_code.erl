@@ -6,12 +6,14 @@
         purge_and_delete/1
     ]).
 
+-include("hoax_int.hrl").
+
 get_export_list(ModuleName, ExpectedFunctions) ->
     case module_exists(ModuleName) of
         true ->
             [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info];
         false ->
-            ExpectedFunctions
+            [ {F, length(A)} || #expectation{key = {_,F,A}} <- ExpectedFunctions ]
     end.
 
 get_callback_list(Behaviour, ModuleName) ->

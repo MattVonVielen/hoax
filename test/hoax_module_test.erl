@@ -11,10 +11,7 @@
 -define(EXPORTS, [{f,2},{g,1},{h,0}]).
 
 -define(EXPECT(F,Args,Action), #expectation{
-        module = m,
-        function = F,
-        arity = length(Args),
-        args = Args,
+        key = {m, F, Args},
         action = Action
     }).
 
