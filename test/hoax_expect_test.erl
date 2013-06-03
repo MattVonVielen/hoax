@@ -6,22 +6,35 @@
 -include("../src/hoax_int.hrl").
 
 assert_exported_should_throw_when_function_not_in_list_test() ->
-    Expectation = #expectation{
-        key = {test_mod, function_0, []},
-        action = default
-    },
-    Exports = [{function_1, 1}],
-    ExpectedError = {no_such_function_to_mock, {function_0, 0}},
-    ?assertError(ExpectedError,
-                 hoax_expect:assert_exported([Expectation], Exports)).
+    ets:new(hoax, [named_table, public]),
+    try
+        Expectation = #expectation{
+            key = {test_mod, function_0, []},
+            action = default
+        },
+        Exports = [{function_1, 1}],
+        ExpectedError = {no_such_function_to_mock, {function_0, 0}},
+        ?assertError(ExpectedError,
+            hoax_expect:assert_exported([Expectation], Exports)),
+        ?assertEqual([], ets:tab2list(hoax))
+    after
+        ets:delete(hoax)
+    end.
 
 assert_exported_should_return_when_function_in_list_test() ->
-    Expectation = #expectation{
-        key = {test_mod, function_0, []},
-        action = default
-    },
-    Exports = [{function_0, 0}, {function_1, 1}],
-    ?assertEqual(ok, hoax_expect:assert_exported([Expectation], Exports)).
+    ets:new(hoax, [named_table, public]),
+    try
+        Expectation = #expectation{
+            key = {test_mod, function_0, []},
+            action = default
+        },
+        Exports = [{function_0, 0}, {function_1, 1}],
+        ?assertEqual(ok, hoax_expect:assert_exported([Expectation],
+                Exports)),
+        ?assertEqual([Expectation], ets:tab2list(hoax))
+    after
+        ets:delete(hoax)
+    end.
 
 parse_should_allow_no_action_given_test() ->
     Expectation = {function_0, []},

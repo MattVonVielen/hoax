@@ -8,9 +8,6 @@
 init_expect(Expect) ->
     ets:insert(hoax, Expect).
 
-record_call(M,F,Args) ->
-    ets:update_counter(hoax, {M,F,Args}, {#expectation.call_count, 1}).
-
 create() ->
     ets:new(hoax, [named_table, public, {keypos, #expectation.key}]).
 
@@ -21,3 +18,15 @@ delete() ->
 
 unmet_expectations() ->
     qlc:e(qlc:q([ Call || #expectation{key = Call, call_count = 0} <- ets:table(hoax) ])).
+
+increment_counter(Key) ->
+    ets:update_counter(hoax, Key, {#expectation.call_count, 1}).
+
+lookup_action(Key) ->
+    case ets:lookup(hoax, Key) of
+        []    ->
+            {error, {unexpected_invocation, Key}};
+        [Rec] ->
+            increment_counter(Key),
+            Rec#expectation.action
+    end.

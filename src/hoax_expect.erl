@@ -7,9 +7,10 @@
 
 -include("hoax_int.hrl").
 
-assert_exported([#expectation{key = {_, F, A}} | Rest], Exports) ->
+assert_exported([Expect = #expectation{key = {_, F, A}} | Rest], Exports) ->
     lists:member({F, length(A)}, Exports) orelse
         error({no_such_function_to_mock, {F, length(A)}}),
+    hoax_tab:init_expect(Expect),
     assert_exported(Rest, Exports);
 assert_exported([], _) ->
     ok.

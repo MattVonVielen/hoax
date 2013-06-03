@@ -22,10 +22,10 @@ mock(ModuleName, Expectations) ->
     Records = hoax_expect:parse(ModuleName, Expectations),
     Exports = hoax_code:get_export_list(ModuleName, Records),
     hoax_expect:assert_exported(Records, Exports),
-    hoax_module:compile(ModuleName, Exports, Records).
+    hoax_module:compile(ModuleName, Exports).
 
 stub(Behaviour, ModuleName, Expectations) ->
     Records = hoax_expect:parse(ModuleName, Expectations),
     Callbacks = hoax_code:get_callback_list(Behaviour, ModuleName),
     hoax_expect:assert_exported(Records, Callbacks),
-    hoax_module:compile(ModuleName, Callbacks, Records).
+    hoax_module:compile(ModuleName, Callbacks).
