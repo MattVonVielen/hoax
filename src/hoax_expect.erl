@@ -14,6 +14,8 @@ assert_exported([#expectation{key = {_, F, A}} | Rest], Exports) ->
 assert_exported([], _) ->
     ok.
 
+parse(Mod,[]) ->
+    error({no_expectations_for_mock, Mod});
 parse(Mod,Expects) ->
     [expectation(Mod, Ex) || Ex <- Expects].
 

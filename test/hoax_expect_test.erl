@@ -101,3 +101,8 @@ parse_should_throw_when_illegal_action_test() ->
     ?assertError(ExpectedError,
                  hoax_expect:parse(test_mod, [Expectation])).
 
+parse_should_throw_when_expectation_list_is_empty_test() ->
+    ExpectedError = {no_expectations_for_mock, test_mod},
+    ?assertError(ExpectedError,
+                 hoax_expect:parse(test_mod, [])).
+
