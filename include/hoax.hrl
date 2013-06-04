@@ -44,7 +44,7 @@
     ((fun () ->
                     case (hoax_tab:unmet_expectations()) of
                         []  -> ok;
-                        Unmet -> .erlang:error({unmet_expectations,
+                        Unmet -> erlang:error({unmet_expectations,
                                 [{module, ?MODULE},
                                     {line, ?LINE},
                                     {expected, Unmet}
