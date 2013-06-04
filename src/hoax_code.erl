@@ -49,4 +49,4 @@ compile(Mod, Forms) ->
     {ok, Mod, Bin} = compile:forms(Forms),
     code:unstick_mod(Mod),
     code:load_binary(Mod, "", Bin),
-    Sticky andalso code:stick_mod(Mod).
+    restore_stickiness(Mod, Sticky).
