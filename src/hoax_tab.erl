@@ -5,7 +5,7 @@
 -include_lib("stdlib/include/qlc.hrl").
 -include("hoax_int.hrl").
 
-init_expect(Expect) ->
+insert(Expect) ->
     ets:insert(hoax, Expect).
 
 create() ->
