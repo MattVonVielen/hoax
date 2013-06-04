@@ -1,19 +1,13 @@
 -module(hoax_module).
 
--export([compile/2]).
+-export([generate/2]).
 
-compile(Mod, Funcs) ->
-    Sticky = code:is_sticky(Mod),
-    {ok, Mod, Bin} = compile:forms(
-        erl_syntax:revert_forms([
-                module_attribute(Mod),
-                export_attribute(Funcs) |
-                [ function(Mod, Func, Arity) || {Func, Arity} <- Funcs ]
-            ])
-    ),
-    code:unstick_mod(Mod),
-    code:load_binary(Mod, "", Bin),
-    Sticky andalso code:stick_mod(Mod).
+generate(Mod, Funcs) ->
+    erl_syntax:revert_forms([
+            module_attribute(Mod),
+            export_attribute(Funcs) |
+            [ function(Mod, Func, Arity) || {Func, Arity} <- Funcs ]
+        ]).
 
 module_attribute(Mod) ->
     erl_syntax:attribute(erl_syntax:atom(module), [erl_syntax:atom(Mod)]).

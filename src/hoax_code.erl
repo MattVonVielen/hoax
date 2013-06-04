@@ -3,7 +3,8 @@
 -export([
         get_export_list/2,
         get_callback_list/2,
-        purge_and_delete/1
+        purge_and_delete/1,
+        compile/2
     ]).
 
 -include("hoax_int.hrl").
@@ -42,3 +43,10 @@ restore_stickiness(ModuleName, true) ->
     code:stick_mod(ModuleName);
 restore_stickiness(_, _) ->
     ok.
+
+compile(Mod, Forms) ->
+    Sticky = code:is_sticky(Mod),
+    {ok, Mod, Bin} = compile:forms(Forms),
+    code:unstick_mod(Mod),
+    code:load_binary(Mod, "", Bin),
+    Sticky andalso code:stick_mod(Mod).
