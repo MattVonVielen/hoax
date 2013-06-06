@@ -1,38 +1,39 @@
 -module(hoax_expect).
 
 -export([
-        validate/1,
-        assert_exported/2
+        assert_exported/2,
+        parse/2
     ]).
 
-validate(Expectations) ->
-    validate(Expectations, []).
+-include("hoax_int.hrl").
 
-validate([{Function, Args} | Rest], Acc)
-    when is_list(Args) ->
-    validate(Rest, [{Function, length(Args)} | Acc]);
-validate([{Function, Args, Action} = Expectation | Rest], Acc)
-    when is_list(Args) ->
-    case valid_action(Action) of
-        true ->
-            validate(Rest, [{Function, length(Args)} | Acc]);
-        false ->
-            error({bad_expectation_syntax, Expectation})
-    end;
-validate([Other | _Rest], _Acc) ->
-    error({bad_expectation_syntax, Other});
-validate([], Acc) ->
-    Acc.
-
-assert_exported([Function | Rest], Exports) ->
-    lists:member(Function, Exports) orelse
-        error({no_such_function_to_mock, Function}),
+assert_exported([Expect = #expectation{key = {_, F, A}} | Rest], Exports) ->
+    lists:member({F, length(A)}, Exports) orelse
+        error({no_such_function_to_mock, {F, length(A)}}),
+    hoax_tab:insert(Expect),
     assert_exported(Rest, Exports);
 assert_exported([], _) ->
     ok.
 
-valid_action({return, _}) -> true;
-valid_action({error, _}) -> true;
-valid_action({exit, _}) -> true;
-valid_action({throw, _}) -> true;
-valid_action(_) -> false.
+parse(Mod,[]) ->
+    error({no_expectations_for_mock, Mod});
+parse(Mod,Expects) ->
+    [expectation(Mod, Ex) || Ex <- Expects].
+
+expectation(Mod, {Function, Args}) when is_atom(Mod), is_list(Args) ->
+    expectation(Mod, Function, Args, default);
+expectation(Mod, {Function, Args, {X,Y}}) when is_atom(Mod),
+                                               is_list(Args),
+                                               X == return;
+                                               X == error;
+                                               X == exit;
+                                               X == throw ->
+    expectation(Mod, Function, Args, {X,Y});
+expectation(_, Other) ->
+    error({bad_expectation_syntax, Other}).
+
+expectation(Mod, Function, Args, Action) ->
+    #expectation{
+        key    = {Mod, Function, Args},
+        action = Action
+    }.

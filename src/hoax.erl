@@ -1,9 +1,8 @@
 -module(hoax).
 
--include("hoax_api.hrl").
 -export([start/0, stop/0]).
--export(?HOAX_API).
--ignore_xref(?HOAX_API).
+-export([mock/2, stub/3]).
+-ignore_xref([mock/2, stub/3]).
 
 %% ===================================================================
 %% hoax API
@@ -20,13 +19,15 @@ stop() ->
 mock(ModuleName, Expectation) when is_tuple(Expectation) ->
     mock(ModuleName, [Expectation]);
 mock(ModuleName, Expectations) ->
-    Functions = hoax_expect:validate(Expectations),
-    Exports = hoax_code:get_export_list(ModuleName, Functions),
-    hoax_expect:assert_exported(Functions, Exports),
-    hoax_module:compile(ModuleName, Functions, Expectations).
+    Records = hoax_expect:parse(ModuleName, Expectations),
+    Exports = hoax_code:get_export_list(ModuleName, Records),
+    hoax_expect:assert_exported(Records, Exports),
+    Forms = hoax_module:generate(ModuleName, Exports),
+    hoax_code:compile(ModuleName, Forms).
 
 stub(Behaviour, ModuleName, Expectations) ->
+    Records = hoax_expect:parse(ModuleName, Expectations),
     Callbacks = hoax_code:get_callback_list(Behaviour, ModuleName),
-    Functions = hoax_expect:validate(Expectations),
-    hoax_expect:assert_exported(Functions, Callbacks),
-    hoax_module:compile(ModuleName, Callbacks, Expectations).
+    hoax_expect:assert_exported(Records, Callbacks),
+    Forms = hoax_module:generate(ModuleName, Callbacks),
+    hoax_code:compile(ModuleName, Forms).

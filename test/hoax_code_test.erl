@@ -3,10 +3,16 @@
 -compile([export_all]).
 
 -include_lib("eunit/include/eunit.hrl").
+-include("../src/hoax_int.hrl").
 
 get_export_list_should_return_expected_function_list_when_module_cannot_be_loaded_test() ->
+    Expectations = [
+        #expectation{key={m,f,[1,2]}},
+        #expectation{key={m,g,[1]}},
+        #expectation{key={m,h,[]}}
+    ],
     ExpectedFunctionList = [{f,2},{g,1},{h,0}],
-    ?assertEqual(ExpectedFunctionList, hoax_code:get_export_list(no_such_module, ExpectedFunctionList)).
+    ?assertEqual(ExpectedFunctionList, hoax_code:get_export_list(no_such_module, Expectations)).
 
 get_export_list_should_return_exports_from_module_excluding_module_info_test() ->
     Exports = hoax_code:get_export_list(hoax_test_module, []),
@@ -39,7 +45,7 @@ purge_and_delete_should_ensure_module_no_longer_loaded_and_restore_stickiness_te
     code:ensure_loaded(hoax_test_module),
     code:stick_mod(hoax_test_module),
 
-    hoax_code:purge_and_delete({hoax_test_module, true}),
+    hoax_code:purge_and_delete(hoax_test_module),
 
     ?assertMatch({file, _}, code:is_loaded(hoax_test_module)),
     ?assert(code:is_sticky(hoax_test_module)).

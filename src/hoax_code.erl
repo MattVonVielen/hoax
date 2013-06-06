@@ -3,15 +3,18 @@
 -export([
         get_export_list/2,
         get_callback_list/2,
-        purge_and_delete/1
+        purge_and_delete/1,
+        compile/2
     ]).
+
+-include("hoax_int.hrl").
 
 get_export_list(ModuleName, ExpectedFunctions) ->
     case module_exists(ModuleName) of
         true ->
             [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info];
         false ->
-            ExpectedFunctions
+            [ {F, length(A)} || #expectation{key = {_,F,A}} <- ExpectedFunctions ]
     end.
 
 get_callback_list(Behaviour, ModuleName) ->
@@ -23,7 +26,8 @@ get_callback_list(Behaviour, ModuleName) ->
         error({not_a_behaviour, Behaviour}),
     Behaviour:behaviour_info(callbacks).
 
-purge_and_delete({ModuleName, Sticky}) ->
+purge_and_delete(ModuleName) ->
+    Sticky = code:is_sticky(ModuleName),
     code:purge(ModuleName),
     code:delete(ModuleName),
     code:ensure_loaded(ModuleName),
@@ -39,3 +43,10 @@ restore_stickiness(ModuleName, true) ->
     code:stick_mod(ModuleName);
 restore_stickiness(_, _) ->
     ok.
+
+compile(Mod, Forms) ->
+    Sticky = code:is_sticky(Mod),
+    {ok, Mod, Bin} = compile:forms(Forms),
+    code:unstick_mod(Mod),
+    code:load_binary(Mod, "", Bin),
+    restore_stickiness(Mod, Sticky).
