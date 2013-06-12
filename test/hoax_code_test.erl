@@ -7,9 +7,9 @@
 
 get_export_list_should_return_expected_function_list_when_module_cannot_be_loaded_test() ->
     Expectations = [
-        #expectation{key={m,f,[1,2]}},
-        #expectation{key={m,g,[1]}},
-        #expectation{key={m,h,[]}}
+        #expectation{key={m,f,2}},
+        #expectation{key={m,g,1}},
+        #expectation{key={m,h,0}}
     ],
     ExpectedFunctionList = [{f,2},{g,1},{h,0}],
     ?assertEqual(ExpectedFunctionList, hoax_code:get_export_list(no_such_module, Expectations)).
