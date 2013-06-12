@@ -34,8 +34,6 @@ should_return_discrete_expected_values_for_appropriate_args_regardless_of_call_o
     hoax_tab:insert(?EXPECT(f,[1,2], {return,result_for_args_1_and_2})),
     hoax_tab:insert(?EXPECT(f,[3,4], {return,result_for_args_3_and_4})),
 
-    ?debugFmt("~p~n", [ets:tab2list(hoax)]),
-
     ?assertEqual(result_for_args_3_and_4, hoax_invocation:handle(m, f, [3, 4])),
     ?assertEqual(result_for_args_1_and_2, hoax_invocation:handle(m, f, [1, 2])).
 
