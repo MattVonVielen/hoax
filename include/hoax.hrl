@@ -53,9 +53,17 @@
         end)())).
 
 -define(expect(Func, Args), {Func, Args}).
--define(expect(Func, Args, Action), {Func, Args, Action}).
+-define(expect(Func, Args, Action_or_Count), {Func, Args, Action_or_Count}).
+-define(expect(Func, Args, Action, Count), {Func, Args, Action, Count}).
+
 -define(withArgs(Args), Args).
+
 -define(andReturn(Val), {return, Val}).
 -define(andThrow(Val), {throw, Val}).
 -define(andError(Val), {error, Val}).
 -define(andExit(Val), {exit, Val}).
+
+-define(times(N), N).
+-define(never, 0).
+-define(once, 1).
+-define(twice, 2).
