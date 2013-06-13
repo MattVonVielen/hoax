@@ -1,5 +1,5 @@
 {application, hoax,
  [
   {description, "Yet another mocking library for Erlang"},
-  {vsn, "0.9.4"}
+  {vsn, "0.9.5"}
  ]}.
