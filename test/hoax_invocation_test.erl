@@ -73,9 +73,20 @@ should_throw_when_unexpected_call() ->
 verifyAll_should_throw_verify_error_when_function_not_called() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),
 
-    ?assertError({unmet_expectations,[{module,hoax_invocation_test},
-                     {line, _},
-                     {expected,[{m,f,[1,2]}]}]}, ?verifyAll).
+    ?assertError({unmet_expectations,[{module,?MODULE},
+                                      {line, _},
+                                      {expected,["m:f(1,2)"]}
+                                     ]}, ?verifyAll).
+
+verifyAll_should_throw_verify_error_when_function_not_called_enough_times() ->
+    hoax_tab:insert(?EXPECT_WITH_COUNT(f, [1,2], {return, a_result}, 2)),
+
+    _Result = hoax_invocation:handle(m, f, [1,2]),
+
+    ?assertError({unmet_expectations,[{module,?MODULE},
+                                      {line, _},
+                                      {expected,["m:f(1,2) [1 of 2 calls]"]}
+                                     ]}, ?verifyAll).
 
 verifyAll_should_do_nothing_when_all_expectations_satisfied() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),

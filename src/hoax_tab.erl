@@ -17,7 +17,10 @@ delete() ->
     Mods.
 
 unmet_expectations() ->
-    qlc:e(qlc:q([ {M,F,A} || #expectation{key = {M,F,_}, args = A, call_count = 0} <- ets:table(hoax) ])).
+    qlc:e(qlc:q([ format_unmet_expectation(X) || X = #expectation{
+                        call_count = C, expected_count = E} <- ets:table(hoax),
+                                                 (is_integer(E) andalso
+                                                  C < E) orelse C == 0 ])).
 
 increment_counter(E = #expectation{call_count=C}) ->
     ets:delete_object(hoax, E),
@@ -25,3 +28,15 @@ increment_counter(E = #expectation{call_count=C}) ->
 
 lookup_expectations(Key) ->
     ets:lookup(hoax, Key).
+
+format_unmet_expectation(#expectation{expected_count = undefined} = X) ->
+    lists:flatten(format_mfa_args(X));
+format_unmet_expectation(#expectation{call_count = C, expected_count = E} = X) ->
+    lists:flatten(io_lib:format("~s [~b of ~b calls]", [format_mfa_args(X), C, E])).
+
+format_mfa_args(#expectation{key = {M,F,_}, args=Args}) ->
+    io_lib:format("~s:~s(~s)", [M, F, format_args(Args)]).
+
+format_args(Args) ->
+    Formatted = lists:flatten(io_lib:format("~p", [Args])),
+    string:sub_string(Formatted, 2, length(Formatted) - 1).
