@@ -30,6 +30,13 @@ should_return_expected_value_when_args_match() ->
 
     ?assertEqual(a_result, Result).
 
+should_return_expected_value_when_expected_args_include_wildcard_match() ->
+    hoax_tab:insert( ?EXPECT(f,[1,'_'], {return,a_result}) ),
+
+    Result = hoax_invocation:handle(m, f, [1, 2]),
+
+    ?assertEqual(a_result, Result).
+
 should_return_discrete_expected_values_for_appropriate_args_regardless_of_call_order() ->
     hoax_tab:insert(?EXPECT(f,[1,2], {return,result_for_args_1_and_2})),
     hoax_tab:insert(?EXPECT(f,[3,4], {return,result_for_args_3_and_4})),
@@ -54,6 +61,12 @@ should_exit_with_expected_error_when_args_match() ->
 
 should_throw_when_args_do_not_match() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),
+
+    ExpectedError = {unexpected_arguments, {m, f, [1, a]}},
+    ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).
+
+should_throw_when_args_do_not_match_wildcard_pattern() ->
+    hoax_tab:insert(?EXPECT(f, ['_',2], {return, a_result})),
 
     ExpectedError = {unexpected_arguments, {m, f, [1, a]}},
     ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).

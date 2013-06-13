@@ -20,8 +20,22 @@ handle(M, F, Args) ->
     end.
 
 find_matching_args(Args, Records) ->
-    lists:keyfind(Args, #expectation.args, Records).
+    keyfind(Args, Records).
+
+keyfind(ActualArgs, [ Expectation = #expectation{args = ExpectedArgs} | Rest ]) ->
+    case replace_wildcards(ActualArgs, ExpectedArgs) of
+        ActualArgs -> Expectation;
+        _          -> keyfind(ActualArgs, Rest)
+    end;
+keyfind(_, []) ->
+    false.
 
 perform(default)         -> '$_hoax_default_return_$';
 perform({return, Value}) -> Value;
 perform({Error, Reason}) -> erlang:Error(Reason).
+
+replace_wildcards(ActualArgs, ExpectedArgs) ->
+    lists:zipwith(fun replace_wildcard/2, ActualArgs, ExpectedArgs).
+
+replace_wildcard(Actual, '_') -> Actual;
+replace_wildcard(_, Expected) -> Expected.

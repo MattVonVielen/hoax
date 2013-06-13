@@ -67,3 +67,5 @@
 -define(never, 0).
 -define(once, 1).
 -define(twice, 2).
+
+-define(any, '_').
