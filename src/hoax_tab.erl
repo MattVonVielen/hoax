@@ -30,13 +30,6 @@ lookup_expectations(Key) ->
     ets:lookup(hoax, Key).
 
 format_unmet_expectation(#expectation{expected_count = undefined} = X) ->
-    lists:flatten(format_mfa_args(X));
+    lists:flatten(hoax_fmt:fmt(X));
 format_unmet_expectation(#expectation{call_count = C, expected_count = E} = X) ->
-    lists:flatten(io_lib:format("~s [~b of ~b calls]", [format_mfa_args(X), C, E])).
-
-format_mfa_args(#expectation{key = {M,F,_}, args=Args}) ->
-    io_lib:format("~s:~s(~s)", [M, F, format_args(Args)]).
-
-format_args(Args) ->
-    Formatted = lists:flatten(io_lib:format("~p", [Args])),
-    string:sub_string(Formatted, 2, length(Formatted) - 1).
+    lists:flatten(io_lib:format("~s [~b of ~b calls]", [hoax_fmt:fmt(X), C, E])).

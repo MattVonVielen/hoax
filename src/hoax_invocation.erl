@@ -6,13 +6,13 @@
 handle(M, F, Args) ->
     case hoax_tab:lookup_expectations({M, F, length(Args)}) of
         [] ->
-            erlang:error({unexpected_invocation, {M, F, Args}});
+            erlang:error({unexpected_invocation, hoax_fmt:fmt({M, F, Args})});
         Records ->
             case find_matching_args(Args, Records) of
                 false ->
-                    erlang:error({unexpected_arguments, {M, F, Args}});
-                #expectation{call_count=X,expected_count=X} ->
-                    erlang:error({too_many_invocations, {M, F, Args}});
+                    erlang:error({unexpected_arguments, hoax_fmt:fmt({M, F, Args})});
+                #expectation{call_count=X,expected_count=X,args=ExpectedArgs} ->
+                    erlang:error({too_many_invocations, X+1, hoax_fmt:fmt({M, F, ExpectedArgs})});
                 #expectation{action = Action} = Record ->
                     hoax_tab:increment_counter(Record),
                     perform(Action)

@@ -62,25 +62,25 @@ should_exit_with_expected_error_when_args_match() ->
 should_throw_when_args_do_not_match() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),
 
-    ExpectedError = {unexpected_arguments, {m, f, [1, a]}},
+    ExpectedError = {unexpected_arguments, "m:f(1,a)"},
     ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).
 
 should_throw_when_args_do_not_match_wildcard_pattern() ->
     hoax_tab:insert(?EXPECT(f, ['_',2], {return, a_result})),
 
-    ExpectedError = {unexpected_arguments, {m, f, [1, a]}},
+    ExpectedError = {unexpected_arguments,  "m:f(1,a)"},
     ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).
 
 should_throw_when_call_count_equals_expected_count() ->
-    hoax_tab:insert(?EXPECT_WITH_COUNT(f, [1,2], {return, a_result}, 0)),
+    hoax_tab:insert(?EXPECT_WITH_COUNT(f, ['_','_'], {return, a_result}, 0)),
 
-    ExpectedError = {too_many_invocations, {m, f, [1, 2]}},
+    ExpectedError = {too_many_invocations, 1, "m:f('_','_')"},
     ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, 2])).
 
 should_throw_when_unexpected_call() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),
 
-    ExpectedError = {unexpected_invocation, {m, g, [1]}},
+    ExpectedError = {unexpected_invocation, "m:g(1)"},
     ?assertError(ExpectedError, hoax_invocation:handle(m, g, [1])).
 
 verifyAll_should_throw_verify_error_when_function_not_called() ->
