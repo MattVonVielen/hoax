@@ -15,6 +15,8 @@ assert_exported([Expect = #expectation{key={_,F,A}} | Rest], Exports) ->
 assert_exported([], _) ->
     ok.
 
+parse(_, expect_no_interactions) ->
+    [];
 parse(Mod,[]) ->
     error({no_expectations_for_mock, Mod});
 parse(Mod,Expects) ->

@@ -84,6 +84,9 @@ parse_should_throw_when_expectation_list_is_empty_test() ->
     ?assertError(ExpectedError,
                  hoax_expect:parse(test_mod, [])).
 
+parse_should_return_empty_list_when_expectation_is_sentinel_value_test() ->
+    ?assertEqual([], hoax_expect:parse(test_mod, expect_no_interactions)).
+
 parse_should_throw_when_bad_expectation_syntax_test_() ->
     [ {T, ?_assertError({bad_expectation_syntax, E},
                         hoax_expect:parse(test_mod, [E]))}
