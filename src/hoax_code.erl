@@ -14,7 +14,7 @@ get_export_list(ModuleName, ExpectedFunctions) ->
         true ->
             [E || E = {F,_} <- ModuleName:module_info(exports), F =/= module_info];
         false ->
-            [ {F, length(A)} || #expectation{key = {_,F,A}} <- ExpectedFunctions ]
+            [ {F, A} || #expectation{key = {_,F,A}} <- ExpectedFunctions ]
     end.
 
 get_callback_list(Behaviour, ModuleName) ->
