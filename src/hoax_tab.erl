@@ -17,10 +17,17 @@ delete() ->
     Mods.
 
 unmet_expectations() ->
-    qlc:e(qlc:q([ format_unmet_expectation(X) || X = #expectation{
-                        call_count = C, expected_count = E} <- ets:table(hoax),
-                                                 (is_integer(E) andalso
-                                                  C < E) orelse C == 0 ])).
+    NoExpectedCountGiven = qlc:q([
+                X || X = #expectation{call_count = 0, expected_count = undefined}
+                     <- ets:table(hoax) ]),
+
+    FewerCallsThanExpected = qlc:q([
+                X || X = #expectation{call_count = C, expected_count = E}
+                     <- ets:table(hoax), is_integer(E), C < E ]),
+
+    MatchingRecords = qlc:e(qlc:append(NoExpectedCountGiven, FewerCallsThanExpected)),
+
+    [ format_unmet_expectation(X) || X <- MatchingRecords ].
 
 increment_counter(E = #expectation{call_count=C}) ->
     ets:delete_object(hoax, E),

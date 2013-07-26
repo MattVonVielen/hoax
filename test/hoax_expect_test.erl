@@ -85,7 +85,14 @@ parse_should_throw_when_expectation_list_is_empty_test() ->
                  hoax_expect:parse(test_mod, [])).
 
 parse_should_return_empty_list_when_expectation_is_sentinel_value_test() ->
-    ?assertEqual([], hoax_expect:parse(test_mod, expect_no_interactions)).
+    ets:new(hoax, [named_table, public]),
+    try
+        Expectation = #expectation{key={test_mod, undefined, undefined}, expected_count=0},
+        ?assertEqual([], hoax_expect:parse(test_mod, expect_no_interactions)),
+        ?assertEqual([Expectation], ets:tab2list(hoax))
+    after
+        ets:delete(hoax)
+    end.
 
 parse_should_throw_when_bad_expectation_syntax_test_() ->
     [ {T, ?_assertError({bad_expectation_syntax, E},

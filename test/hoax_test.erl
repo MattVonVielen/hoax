@@ -10,7 +10,7 @@ stop_should_unload_all_hoaxed_modules_test() ->
     hoax:start(),
 
     try
-        mock(no_such_module, ?expect(foo, ?withArgs([]))),
+        mock(no_such_module, expect_no_interactions),
         mock(hoax_test_module, ?expect(function_one, ?withArgs([1, 2]), ?andReturn(mocked_return_value))),
 
         ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))

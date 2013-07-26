@@ -15,7 +15,8 @@ assert_exported([Expect = #expectation{key={_,F,A}} | Rest], Exports) ->
 assert_exported([], _) ->
     ok.
 
-parse(_, expect_no_interactions) ->
+parse(Mod, expect_no_interactions) ->
+    hoax_tab:insert(#expectation{key={Mod,undefined,undefined}, expected_count=0}),
     [];
 parse(Mod,[]) ->
     error({no_expectations_for_mock, Mod});
