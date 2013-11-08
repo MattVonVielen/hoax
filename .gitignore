@@ -3,6 +3,5 @@ ebin/
 deps/
 rebar
 rebar.cmd
-Gemfile.lock
 .idea/
 *.iml
