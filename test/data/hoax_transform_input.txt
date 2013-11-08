@@ -1,0 +1,11 @@
+-module(m).
+
+-compile([export_all, {parse_transform, hoax_transform}]).
+
+f() ->
+    V = 1,
+    hoax:mock(
+        module:function(some_value, _, V),
+        module:function() > arbitrary_return_value,
+        module:function() > error(some_error)
+     ).

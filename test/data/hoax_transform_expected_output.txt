@@ -1,0 +1,9 @@
+-module(m).
+
+-compile([export_all, {parse_transform, hoax_transform}]).
+
+f() ->
+    V = 1,
+    hoax:mock([{expectation, 8, module, function, [some_value, '_', V], default},
+	       {expectation, 9, module, function, [], fun () -> arbitrary_return_value end},
+	       {expectation, 10, module, function, [], fun () -> error(some_error) end}]).
