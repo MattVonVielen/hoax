@@ -4,6 +4,9 @@
 
 f() ->
     V = 1,
-    hoax:mock([{expectation, 8, module, function, [some_value, '_', V], default},
-	       {expectation, 9, module, function, [], fun () -> arbitrary_return_value end},
-	       {expectation, 10, module, function, [], fun () -> error(some_error) end}]).
+    hoax:mock([{expectation, {module, function, 3}, "module:function(some_value, _, V)", 8, [some_value, '_', V], default, 0,
+		undefined},
+	       {expectation, {module, function, 0}, "module:function()", 9, [], fun () -> arbitrary_return_value end, 0,
+		undefined},
+	       {expectation, {module, function, 0}, "module:function()", 10, [], fun () -> error(some_error) end, 0,
+		undefined}]).

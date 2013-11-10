@@ -1,11 +1,9 @@
--type error_class() :: error | exit | throw.
--type action()      :: default | {return, term()} | {error_class(), term()}.
--type m_f_a()       :: { Module::atom(), Function::atom(), Arity::non_neg_integer() }.
-
 -record(expectation, {
-        key              :: m_f_a(),
-        args             :: [term()],
-        action = default :: action(),
-        call_count = 0   :: integer(),
-        expected_count   :: integer() | undefined
-    }).
+    key              :: { Module::atom(), Function::atom(), Arity::non_neg_integer() },
+    desc             :: string(),
+    line_num         :: non_neg_integer(),
+    args             :: [term()],
+    action = default :: default | fun(() -> any()),
+    call_count = 0   :: integer(),
+    expected_count   :: integer() | undefined
+}).

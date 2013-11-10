@@ -11,5 +11,5 @@ parse_transform_test() ->
     OutputForms = hoax_transform:parse_transform(InputForms, {ignored}),
 
     FormList = erl_syntax:form_list(OutputForms),
-    OutputText = erl_prettypr:format(FormList, [{paper, 100}, {ribbon, 100}]),
+    OutputText = erl_prettypr:format(FormList, [{paper, 128}, {ribbon, 128}]),
     ?assertEqual(binary_to_list(ExpectedText), OutputText).
