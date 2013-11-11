@@ -24,3 +24,12 @@ call_counts_are_converted() ->
 	       {expectation, {module, function, 0}, "module:function()", 33, [], default, 0, 1},
 	       {expectation, {module, function, 0}, "module:function()", 34, [], default, 0, 2},
 	       {expectation, {module, function, 0}, "module:function()", 35, [], default, 0, 23}]).
+
+funs_for_return_values_are_preserved() ->
+    V = 1, hoax:mock([{expectation, {module, function, 0}, "module:function()", 41, [], fun () -> V end, 0, undefined}]).
+
+allow_expectations_inside_fun_expressions() ->
+    fun () -> hoax:mock([{expectation, {module, function, 0}, "module:function()", 45, [], default, 0, undefined}]) end.
+
+allow_expectations_inside_try_expressions() ->
+    try hoax:mock([{expectation, {module, function, 0}, "module:function()", 49, [], default, 0, undefined}]) after ok end.

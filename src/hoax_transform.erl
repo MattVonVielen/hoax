@@ -18,18 +18,23 @@ forms([F0|Fs0]) ->
 forms([]) -> [].
 
 transform({function, Line, Name, Arity, Clauses}) ->
-    {function, Line, Name, Arity, [transform_clause(Clause) || Clause <- Clauses]};
-transform(Other) -> Other.
-
-transform_clause({clause, Line, Head, Guard, Body}) ->
-    Exprs = [transform_expression(Expr) || Expr <- Body],
-    {clause, Line, Head, Guard, Exprs}.
-
-transform_expression({call, Line, Call = {remote, _, {atom, _, hoax}, {atom, _, mock}},
-    Expectations}) ->
+    {function, Line, Name, Arity, [transform(Clause) || Clause <- Clauses]};
+transform({clause, Line, Head, Guard, Body}) ->
+    {clause, Line, Head, Guard, [transform(Expr) || Expr <- Body]};
+transform({call, Line, Call = {remote, _, {atom, _, hoax}, {atom, _, mock}}, Expectations}) ->
     Transformed = [transform_expectation(Expectation) || Expectation <- Expectations],
     {call, Line, Call, [list_to_forms(Line, Transformed)]};
-transform_expression(Other) -> Other.
+transform({call, Line, Call, Arguments}) ->
+    {call, Line, Call, [transform(Arg) || Arg <- Arguments]};
+transform({'fun', Line, {clauses, Clauses}}) ->
+    {'fun', Line, {clauses, [transform(Clause) || Clause <- Clauses]}};
+transform({'try', Line, Body, Clauses, Handlers, After}) ->
+    TransformedBody = [transform(Expr) || Expr <- Body],
+    TransformedClauses = [transform(Clause) || Clause <- Clauses],
+    TransformedHandlers = [transform(Handler) || Handler <- Handlers],
+    TransformedAfter = [transform(Expr) || Expr <- After],
+    {'try', Line, TransformedBody, TransformedClauses, TransformedHandlers, TransformedAfter};
+transform(Other) -> Other.
 
 transform_expectation({op, _, '>', Call, Action}) ->
     transform_expectation(Call, Action);

@@ -29,8 +29,24 @@ no_expectations_becomes_empty_list() ->
 
 call_counts_are_converted() ->
     hoax:mock(
-        never(module:function()),
-        once(module:function()),
-        twice(module:function()),
+        never( module:function() ),
+        once( module:function() ),
+        twice( module:function() ),
         times(23, module:function())
     ).
+
+funs_for_return_values_are_preserved() ->
+    V = 1,
+    hoax:mock(
+        module:function() > fun() -> V end
+    ).
+
+allow_expectations_inside_fun_expressions() ->
+    fun() -> hoax:mock( module:function() ) end.
+
+allow_expectations_inside_try_expressions() ->
+    try
+        hoax:mock( module:function() )
+    after
+        ok
+    end.
