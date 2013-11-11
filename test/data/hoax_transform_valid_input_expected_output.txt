@@ -18,3 +18,9 @@ return_values_and_actions_become_funs() ->
 		undefined}]).
 
 no_expectations_becomes_empty_list() -> hoax:mock([]).
+
+call_counts_are_converted() ->
+    hoax:mock([{expectation, {module, function, 0}, "module:function()", 32, [], default, 0, 0},
+	       {expectation, {module, function, 0}, "module:function()", 33, [], default, 0, 1},
+	       {expectation, {module, function, 0}, "module:function()", 34, [], default, 0, 2},
+	       {expectation, {module, function, 0}, "module:function()", 35, [], default, 0, 23}]).

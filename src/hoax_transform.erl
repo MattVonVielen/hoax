@@ -26,18 +26,29 @@ transform_clause({clause, Line, Head, Guard, Body}) ->
     {clause, Line, Head, Guard, Exprs}.
 
 transform_expression({call, Line, Call = {remote, _, {atom, _, hoax}, {atom, _, mock}},
-                      Expectations}) ->
+    Expectations}) ->
     Transformed = [transform_expectation(Expectation) || Expectation <- Expectations],
     {call, Line, Call, [list_to_forms(Line, Transformed)]};
 transform_expression(Other) -> Other.
 
 transform_expectation({op, _, '>', Call, Action}) ->
-    transform_call(Call, Action);
+    transform_expectation(Call, Action);
 transform_expectation(Call) ->
-    transform_call(Call, default).
+    transform_expectation(Call, default).
 
-transform_call({call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} = Call,
-                Action) ->
+transform_expectation({call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} = Call, Action) ->
+    transform_call(Line, Mod, Func, Args, Call, Action, undefined);
+transform_expectation({call, _, {atom, _, CountWord}, [{call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} = Call]},
+                      Action) when CountWord == never; CountWord == once; CountWord == twice ->
+    Count = case CountWord of never -> 0; once -> 1; twice -> 2 end,
+    transform_call(Line, Mod, Func, Args, Call, Action, Count);
+transform_expectation({call, _, {atom, _, times}, [{integer, _, Count}, {call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} = Call]},
+                      Action) ->
+    transform_call(Line, Mod, Func, Args, Call, Action, Count);
+transform_expectation(Other, _) ->
+    throw({(element(2, Other)), ["bad hoax expectation: ", forms_to_code(Other)]}).
+
+transform_call(Line, Mod, Func, Args, Call, Action, ExpectedCount) ->
     Rec = #expectation{
         key = make_key(Line, Mod, Func, length(Args)),
         desc = {string, Line, forms_to_code(Call)},
@@ -45,14 +56,15 @@ transform_call({call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} 
         args = transform_arguments(Line, Args),
         action = transform_action(Line, Action),
         call_count = {integer, Line, 0},
-        expected_count = {atom, Line, undefined}
+        expected_count = transform_expected_count(Line, ExpectedCount)
     },
     Fields = tl(tuple_to_list(Rec)),
-    {tuple, Line, [{atom, Line, expectation} | Fields]};
-transform_call(Other, _) ->
-    Line = element(2, Other),
-    Error = ["bad hoax expectation: ", forms_to_code(Other)],
-    throw({Line, Error}).
+    {tuple, Line, [{atom, Line, expectation} | Fields]}.
+
+transform_expected_count(Line, undefined) ->
+    {atom, Line, undefined};
+transform_expected_count(Line, Count) ->
+    {integer, Line, Count}.
 
 make_key(Line, Mod, Func, Arity) ->
     {tuple, Line, [
@@ -90,5 +102,5 @@ forms_to_code(Form) ->
 format_error(Message) ->
     case io_lib:deep_char_list(Message) of
         true -> Message;
-        _    -> io_lib:write(Message)
+        _ -> io_lib:write(Message)
     end.

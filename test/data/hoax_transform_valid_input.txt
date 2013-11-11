@@ -26,3 +26,11 @@ return_values_and_actions_become_funs() ->
 
 no_expectations_becomes_empty_list() ->
     hoax:mock().
+
+call_counts_are_converted() ->
+    hoax:mock(
+        never(module:function()),
+        once(module:function()),
+        twice(module:function()),
+        times(23, module:function())
+    ).
