@@ -1,0 +1,20 @@
+-module(m).
+
+-compile([export_all, {parse_transform, hoax_transform}]).
+
+default_action() ->
+    hoax:mock([{expectation, {module, function, 1}, "module:function(some_value)", 7, [some_value], default, 0, undefined}]).
+
+underscores_become_atoms() ->
+    hoax:mock([{expectation, {module, function, 1}, "module:function(_)", 12, ['_'], default, 0, undefined}]).
+
+variables_are_preserved() ->
+    V = 1, hoax:mock([{expectation, {module, function, 1}, "module:function(V)", 18, [V], default, 0, undefined}]).
+
+return_values_and_actions_become_funs() ->
+    hoax:mock([{expectation, {module, function, 0}, "module:function()", 23, [], fun () -> arbitrary_return_value end, 0,
+		undefined},
+	       {expectation, {module, function, 0}, "module:function()", 24, [], fun () -> error(some_error) end, 0,
+		undefined}]).
+
+no_expectations_becomes_empty_list() -> hoax:mock([]).

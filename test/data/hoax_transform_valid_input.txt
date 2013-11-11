@@ -1,0 +1,28 @@
+-module(m).
+
+-compile([export_all, {parse_transform, hoax_transform}]).
+
+default_action() ->
+    hoax:mock(
+        module:function(some_value)
+     ).
+
+underscores_become_atoms() ->
+    hoax:mock(
+        module:function(_)
+     ).
+
+variables_are_preserved() ->
+    V = 1,
+    hoax:mock(
+        module:function(V)
+     ).
+
+return_values_and_actions_become_funs() ->
+    hoax:mock(
+        module:function() > arbitrary_return_value,
+        module:function() > error(some_error)
+     ).
+
+no_expectations_becomes_empty_list() ->
+    hoax:mock().

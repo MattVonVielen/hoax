@@ -1,0 +1,8 @@
+-module(m).
+
+-compile([export_all, {parse_transform, hoax_transform}]).
+
+f() ->
+    hoax:mock(
+        not_a_function_call
+     ).

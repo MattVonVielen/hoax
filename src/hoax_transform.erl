@@ -1,12 +1,21 @@
 -module(hoax_transform).
 
--export([parse_transform/2]).
+-export([parse_transform/2, format_error/1]).
 -include("hoax_int.hrl").
 
 parse_transform(Forms, _Options) ->
-    Res = [transform(Form) || Form <- Forms],
-    io:format("~s\n\n", [forms_to_code(Res)]),
+    Res = forms(Forms),
+%%     io:format("~s\n\n", [forms_to_code(Res)]),
     Res.
+
+forms([F0|Fs0]) ->
+    F1 = try transform(F0)
+         catch throw:{Line, Error} ->
+             {error, {Line, ?MODULE, Error}}
+         end,
+    Fs1 = forms(Fs0),
+    [F1|Fs1];
+forms([]) -> [].
 
 transform({function, Line, Name, Arity, Clauses}) ->
     {function, Line, Name, Arity, [transform_clause(Clause) || Clause <- Clauses]};
@@ -39,7 +48,11 @@ transform_call({call, _, {remote, Line, {atom, _, Mod}, {atom, _, Func}}, Args} 
         expected_count = {atom, Line, undefined}
     },
     Fields = tl(tuple_to_list(Rec)),
-    {tuple, Line, [{atom, Line, expectation} | Fields]}.
+    {tuple, Line, [{atom, Line, expectation} | Fields]};
+transform_call(Other, _) ->
+    Line = element(2, Other),
+    Error = ["bad hoax expectation: ", forms_to_code(Other)],
+    throw({Line, Error}).
 
 make_key(Line, Mod, Func, Arity) ->
     {tuple, Line, [
@@ -71,3 +84,11 @@ forms_to_code(Forms) when is_list(Forms) ->
     erl_prettypr:format(erl_syntax:form_list(Forms), [{paper, 128}, {ribbon, 128}]);
 forms_to_code(Form) ->
     forms_to_code([Form]).
+
+%% This function is called by the Erlang compiler to obtain an error
+%% message which will be shown to the user.
+format_error(Message) ->
+    case io_lib:deep_char_list(Message) of
+        true -> Message;
+        _    -> io_lib:write(Message)
+    end.
