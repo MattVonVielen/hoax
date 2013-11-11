@@ -6,3 +6,8 @@ f() ->
     hoax:mock(
         not_a_function_call
      ).
+
+g() ->
+    hoax:mock(
+        module:function() > fun(X) -> X end
+    ).

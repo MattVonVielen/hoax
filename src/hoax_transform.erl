@@ -82,8 +82,10 @@ underscores_to_atoms(Other) -> Other.
 
 transform_action(Line, default) ->
     {atom, Line, default};
-transform_action(_Line, Action = {'fun', _, _}) ->
+transform_action(_Line, Action = {'fun', _, {clauses, [{clause, _, [], _, _} | _]}}) ->
     Action;
+transform_action(_Line, {'fun', Line, _}) ->
+    throw({Line, "bad hoax expectation: functions used for return values must be nullary"});
 transform_action(Line, Action) ->
     {'fun', Line, {clauses, [{clause, Line, [], [], [Action]}]}}.
 
