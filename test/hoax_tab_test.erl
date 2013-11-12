@@ -12,12 +12,13 @@ unmet_expectations_fixture_test_() ->
      fun() -> hoax_tab:create() end,
      fun(_) -> hoax_tab:delete() end,
      [ ?_test("Include expectation when not called", begin
-                    hoax_tab:insert(#expectation{key={m,f,2}, args=[1,2]}),
-                    ?assertEqual(["m:f(1,2)"], hoax_tab:unmet_expectations()) end),
+                    Expectation = #expectation{key = {m, f, 2}, args = [1, 2]},
+                    hoax_tab:insert(Expectation),
+                    ?assertEqual([Expectation], hoax_tab:unmet_expectations()) end),
       ?_test("Include expectation when not called enough times", begin
-                    hoax_tab:insert(#expectation{key={m,f,2}, args=[1,2],
-                                                 expected_count=2, call_count=1}),
-                    ?assertEqual(["m:f(1,2) [1 of 2 calls]"], hoax_tab:unmet_expectations()) end),
+                    Expectation = #expectation{key = {m, f, 2}, args = [1, 2], expected_count = 2, call_count = 1},
+                    hoax_tab:insert(Expectation),
+                    ?assertEqual([Expectation], hoax_tab:unmet_expectations()) end),
       ?_test("Omit expectation when called correct number of times", begin
                     hoax_tab:insert(#expectation{key={m,f,2}, args=[1,2],
                                                  expected_count=2, call_count=2}),

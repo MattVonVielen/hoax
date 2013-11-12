@@ -1,6 +1,6 @@
 -module(hoax_tab).
 
--compile([export_all]).
+-export([create/0, delete/0, insert/1, lookup/1, increment_counter/1, unmet_expectations/0]).
 
 -include_lib("stdlib/include/qlc.hrl").
 -include("hoax_int.hrl").
@@ -25,9 +25,7 @@ unmet_expectations() ->
                 X || X = #expectation{call_count = C, expected_count = E}
                      <- ets:table(hoax), is_integer(E), C < E ]),
 
-    MatchingRecords = qlc:e(qlc:append(NoExpectedCountGiven, FewerCallsThanExpected)),
-
-    [ format_unmet_expectation(X) || X <- MatchingRecords ].
+    qlc:e(qlc:append(NoExpectedCountGiven, FewerCallsThanExpected)).
 
 increment_counter(E = #expectation{call_count=C}) ->
     ets:delete_object(hoax, E),
@@ -35,8 +33,3 @@ increment_counter(E = #expectation{call_count=C}) ->
 
 lookup(Key) ->
     ets:lookup(hoax, Key).
-
-format_unmet_expectation(#expectation{expected_count = undefined} = X) ->
-    lists:flatten(hoax_fmt:fmt(X));
-format_unmet_expectation(#expectation{call_count = C, expected_count = E} = X) ->
-    lists:flatten(io_lib:format("~s [~b of ~b calls]", [hoax_fmt:fmt(X), C, E])).
