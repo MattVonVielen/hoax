@@ -31,8 +31,7 @@ keyfind(_, []) ->
     false.
 
 perform(default)         -> '$_hoax_default_return_$';
-perform({return, Value}) -> Value;
-perform({Error, Reason}) -> erlang:Error(Reason).
+perform(Fun) -> Fun().
 
 replace_wildcards(ActualArgs, ExpectedArgs) ->
     lists:zipwith(fun replace_wildcard/2, ActualArgs, ExpectedArgs).
