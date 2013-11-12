@@ -33,7 +33,7 @@ increment_counter(E = #expectation{call_count=C}) ->
     ets:delete_object(hoax, E),
     ets:insert(hoax, E#expectation{call_count = C+1}).
 
-lookup_expectations(Key) ->
+lookup(Key) ->
     ets:lookup(hoax, Key).
 
 format_unmet_expectation(#expectation{expected_count = undefined} = X) ->

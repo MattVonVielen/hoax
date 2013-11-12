@@ -4,7 +4,7 @@
 -include("hoax_int.hrl").
 
 handle(M, F, Args) ->
-    case hoax_tab:lookup_expectations({M, F, length(Args)}) of
+    case hoax_tab:lookup({M, F, length(Args)}) of
         [] ->
             erlang:error({unexpected_invocation, hoax_fmt:fmt({M, F, Args})});
         Records ->
