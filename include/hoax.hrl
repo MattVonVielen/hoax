@@ -5,14 +5,7 @@
         {foreach,
             fun() -> hoax:start(), Setup() end,
             fun(X) -> Teardown(X), hoax:stop() end,
-            [ {?MODULE, F} ||
-                {F, 0} <- ?MODULE:module_info(exports),
-                F =/= hoax_fixture_test_,
-                F =/= module_info,
-                F =/= test,
-                F =/= Setup,
-                F =/= Teardown
-            ]
+            hoax_macro:test_list(?MODULE, Setup, Teardown)
         }
 ).
 
@@ -25,14 +18,7 @@
         {foreach,
             fun() -> hoax:start(), Setup() end,
             fun(X) -> Teardown(X), hoax:stop() end,
-            [ {with, [{?MODULE, F}]} ||
-                {F, 1} <- ?MODULE:module_info(exports),
-                F =/= hoax_fixture_test_,
-                F =/= module_info,
-                F =/= test,
-                F =/= Setup,
-                F =/= Teardown
-            ]
+            hoax_macro:test_list(?MODULE, Setup, Teardown)
         }
 ).
 
