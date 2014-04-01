@@ -15,7 +15,7 @@ handle(M, F, Args) ->
                     erlang:error({too_many_invocations, X+1, hoax_fmt:fmt({M, F, ExpectedArgs})});
                 #expectation{action = Action} = Record ->
                     hoax_tab:increment_counter(Record),
-                    perform(Action)
+                    perform(Action, Args)
             end
     end.
 
@@ -30,9 +30,11 @@ keyfind(ActualArgs, [ Expectation = #expectation{args = ExpectedArgs} | Rest ]) 
 keyfind(_, []) ->
     false.
 
-perform(default)         -> '$_hoax_default_return_$';
-perform({return, Value}) -> Value;
-perform({Error, Reason}) -> erlang:Error(Reason).
+perform(default, _)         -> '$_hoax_default_return_$';
+perform({return_fun_result, Fun}, Args) ->
+    erlang:apply(Fun, Args);
+perform({return, Value}, _) -> Value;
+perform({Error, Reason}, _) -> erlang:Error(Reason).
 
 replace_wildcards(ActualArgs, ExpectedArgs) ->
     lists:zipwith(fun replace_wildcard/2, ActualArgs, ExpectedArgs).

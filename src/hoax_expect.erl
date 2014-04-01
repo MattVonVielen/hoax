@@ -23,6 +23,8 @@ parse(Mod,[]) ->
 parse(Mod,Expects) ->
     [expectation(Mod, Ex) || Ex <- Expects].
 
+expectation(Mod, {FunctionName, Lambda}) when is_function(Lambda) ->
+    expectation(Mod, FunctionName, hoax_fun:create_wildcard_for_args(Lambda), {return_fun_result, Lambda}, undefined);
 expectation(Mod, {Function, Args}) when is_atom(Mod), is_list(Args) ->
     expectation(Mod, Function, Args, default, undefined);
 expectation(Mod, {Function, Args, Count}) when is_atom(Mod),
