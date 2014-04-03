@@ -42,3 +42,14 @@ should_be_able_to_mock_sticky_modules_test() ->
     after
         code:unstick_mod(hoax_test_module)
     end.
+
+full_stack_fun_expectation_test() ->
+    hoax:start(),
+    Expected = 1,
+    mock(hoax_test_module, ?expect(function_two, fun(Val) ->
+                                  ?assertEqual(Expected, Val),
+                                  local_return
+                                  end)),
+
+    ?assertEqual(local_return, hoax_test_module:function_two(Expected)),
+    hoax:stop().

@@ -30,6 +30,16 @@ should_return_expected_value_when_args_match() ->
 
     ?assertEqual(a_result, Result).
 
+should_return_fun_result_when_expected_args_for_fun() ->
+    Fun = fun(Val1, Val2) -> {Val1, Val2} end,
+
+    hoax_tab:insert( ?EXPECT(f,['_','_'], {return_fun_result,Fun}) ),
+
+    Result = hoax_invocation:handle(m, f, [1, 2]),
+
+    ?assertEqual({1,2}, Result).
+
+
 should_return_expected_value_when_expected_args_include_wildcard_match() ->
     hoax_tab:insert( ?EXPECT(f,[1,'_'], {return,a_result}) ),
 

@@ -94,6 +94,14 @@ parse_should_return_empty_list_when_expectation_is_sentinel_value_test() ->
         ets:delete(hoax)
     end.
 
+parse_should_allow_fun_in_lieu_of_args_test() ->
+    Fun = fun(Arg1, Arg2,Arg3) -> {Arg1,Arg2,Arg3} end,
+    Expectation = {function_0, Fun},
+    [Result] = hoax_expect:parse(test_mod, [Expectation]),
+    ExpectedOutput = #expectation{key={test_mod, function_0, 3}, args=['_', '_', '_'],
+                                  action={return_fun_result, Fun}},
+    ?assertEqual(ExpectedOutput, Result).
+
 parse_should_throw_when_bad_expectation_syntax_test_() ->
     [ {T, ?_assertError({bad_expectation_syntax, E},
                         hoax_expect:parse(test_mod, [E]))}
