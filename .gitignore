@@ -3,5 +3,6 @@ ebin/
 deps/
 rebar
 rebar.cmd
+.rebar/
 .idea/
 *.iml
