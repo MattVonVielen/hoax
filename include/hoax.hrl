@@ -27,16 +27,16 @@
 ).
 
 -define(verifyAll,
-    ((fun () ->
-                    case (hoax_tab:unmet_expectations()) of
-                        []  -> ok;
-                        Unmet -> erlang:error({unmet_expectations,
-                                [{module, ?MODULE},
-                                    {line, ?LINE},
-                                    {expected, Unmet}
-                                ]})
-                end
-        end)())).
+    ((fun() ->
+        case (hoax_tab:unmet_expectations()) of
+            [] -> ok;
+            Unmet -> erlang:error({unmet_expectations,
+                [{module, ?MODULE},
+                    {line, ?LINE},
+                    {expected, Unmet}
+                ]})
+        end
+    end)())).
 
 -define(expect(Func, Args), {Func, Args}).
 -define(expect(Func, Args, Action_or_Count), {Func, Args, Action_or_Count}).
