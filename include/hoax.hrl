@@ -13,18 +13,6 @@
     ?HOAX_FIXTURE(fun() -> ok end, fun(_) -> ok end)
 ).
 
--define(HOAX_FIXTURE_WITH_ARG(Setup, Teardown),
-    hoax_fixture_test_() ->
-        {foreach,
-            fun() -> hoax:start(), Setup() end,
-            fun(X) -> Teardown(X), hoax:stop() end,
-            hoax_macro:test_list(?MODULE, Setup, Teardown)
-        }
-).
-
--define(HOAX_FIXTURE_WITH_ARG,
-    ?HOAX_FIXTURE_WITH_ARG(fun() -> ok end, fun(_) -> ok end)
-).
 
 -define(verifyAll,
     ((fun() ->
