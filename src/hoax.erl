@@ -2,6 +2,7 @@
 
 -export([start/0, stop/0]).
 -export([mock/2, stub/3]).
+-export([test/1]).
 -ignore_xref([mock/2, stub/3]).
 
 %% ===================================================================
@@ -31,3 +32,11 @@ stub(Behaviour, ModuleName, Expectations) ->
     hoax_expect:assert_exported(Records, Callbacks),
     Forms = hoax_module:generate(ModuleName, Callbacks),
     hoax_code:compile(ModuleName, Forms).
+
+test(Func) when is_function(Func, 0) ->
+    try
+        start(),
+        Func()
+    after
+        stop()
+    end.
