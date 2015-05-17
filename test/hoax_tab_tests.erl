@@ -1,4 +1,4 @@
--module(hoax_tab_test).
+-module(hoax_tab_tests).
 
 -compile([export_all]).
 

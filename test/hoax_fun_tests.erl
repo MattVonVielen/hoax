@@ -1,4 +1,4 @@
--module(hoax_fun_test).
+-module(hoax_fun_tests).
 
 -include_lib("eunit/include/eunit.hrl").
 
@@ -6,8 +6,8 @@
 
 should_find_name_in_module_test_() ->
     [
-     ?_assertEqual(setup, hoax_fun:find_name_in_module(?MODULE, fun hoax_fun_test:setup/0 )),
-     ?_assertEqual(teardown, hoax_fun:find_name_in_module(?MODULE, fun hoax_fun_test:teardown/1 ))
+     ?_assertEqual(setup, hoax_fun:find_name_in_module(?MODULE, fun hoax_fun_tests:setup/0 )),
+     ?_assertEqual(teardown, hoax_fun:find_name_in_module(?MODULE, fun hoax_fun_tests:teardown/1 ))
     ].
 
 setup() ->

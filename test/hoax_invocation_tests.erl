@@ -1,4 +1,4 @@
--module(hoax_invocation_test).
+-module(hoax_invocation_tests).
 
 -compile([export_all]).
 
