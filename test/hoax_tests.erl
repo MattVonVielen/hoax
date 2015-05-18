@@ -53,3 +53,67 @@ full_stack_fun_expectation_test() ->
 
     ?assertEqual(local_return, hoax_test_module:function_two(Expected)),
     hoax:stop().
+
+-define(MOD, module_for_testing_fixtures).
+
+fixture_for_entire_module_without_setup_and_teardown_test() ->
+    ExpectedSortedFunctions = [
+        prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
+        prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
+        setup, test_function1, test_function2
+    ],
+
+    {foreach, _, _, Tests} = hoax:fixture(?MOD),
+
+    ?assertEqual(ExpectedSortedFunctions, lists:sort([F || {_,F} <- Tests])).
+
+fixture_for_entire_module_with_setup_and_teardown_test() ->
+    ExpectedSortedFunctions = [
+        prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
+        prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
+        test_function1, test_function2
+    ],
+
+    {foreach, _, _, Tests} = hoax:fixture(?MOD, setup, teardown),
+
+    ?assertEqual(ExpectedSortedFunctions, lists:sort([F || {_,F} <- Tests])).
+
+fixture_for_prefix_without_setup_and_teardown_test() ->
+    ExpectedSortedPrefix1Functions = [
+        prefix1_setup, prefix1_test_function_1, prefix1_test_function_2
+    ],
+    ExpectedSortedPrefix2Functions = [
+        prefix2_setup, prefix2_test_function_1, prefix2_test_function_2
+    ],
+
+    {foreach, _, _, Prefix1Tests} = hoax:fixture(?MOD, prefix1),
+    {foreach, _, _, Prefix2Tests} = hoax:fixture(?MOD, prefix2),
+
+    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort([F || {_,F} <- Prefix1Tests])),
+    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort([F || {_,F} <- Prefix2Tests])),
+
+    {foreach, _, _, Prefix1TestsFromString} = hoax:fixture(?MOD, "prefix1"),
+    {foreach, _, _, Prefix2TestsFromString} = hoax:fixture(?MOD, "prefix2"),
+
+    ?assertEqual(Prefix1Tests, Prefix1TestsFromString),
+    ?assertEqual(Prefix2Tests, Prefix2TestsFromString).
+
+fixture_for_prefix_with_setup_and_teardown_test() ->
+    ExpectedSortedPrefix1Functions = [
+        prefix1_test_function_1, prefix1_test_function_2
+    ],
+    ExpectedSortedPrefix2Functions = [
+        prefix2_test_function_1, prefix2_test_function_2
+    ],
+
+    {foreach, _, _, Prefix1Tests} = hoax:fixture(?MOD, prefix1, prefix1_setup, prefix1_teardown),
+    {foreach, _, _, Prefix2Tests} = hoax:fixture(?MOD, prefix2, prefix2_setup, prefix2_teardown),
+
+    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort([F || {_,F} <- Prefix1Tests])),
+    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort([F || {_,F} <- Prefix2Tests])),
+
+    {foreach, _, _, Prefix1TestsFromString} = hoax:fixture(?MOD, "prefix1", prefix1_setup, prefix1_teardown),
+    {foreach, _, _, Prefix2TestsFromString} = hoax:fixture(?MOD, "prefix2", prefix2_setup, prefix2_teardown),
+
+    ?assertEqual(Prefix1Tests, Prefix1TestsFromString),
+    ?assertEqual(Prefix2Tests, Prefix2TestsFromString).
