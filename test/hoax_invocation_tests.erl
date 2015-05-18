@@ -1,12 +1,10 @@
--module(hoax_invocation_test).
+-module(hoax_invocation_tests).
 
 -compile([export_all]).
 
 -include_lib("eunit/include/eunit.hrl").
 -include_lib("hoax/include/hoax.hrl").
 -include("../src/hoax_int.hrl").
-
-?HOAX_FIXTURE.
 
 -define(EXPORTS, [{f,2},{g,1},{h,0}]).
 
@@ -22,6 +20,9 @@
         expected_count = Count,
         action = Action
     }).
+
+hoax_invocation_test_() ->
+    hoax:fixture(?MODULE).
 
 should_return_expected_value_when_args_match() ->
     hoax_tab:insert( ?EXPECT(f,[1,2], {return,a_result}) ),

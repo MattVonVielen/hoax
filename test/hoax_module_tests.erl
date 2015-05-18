@@ -1,4 +1,4 @@
--module(hoax_module_test).
+-module(hoax_module_tests).
 
 -compile([export_all]).
 -include_lib("eunit/include/eunit.hrl").

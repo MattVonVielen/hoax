@@ -1,4 +1,4 @@
--module(hoax_expect_test).
+-module(hoax_expect_tests).
 
 -compile([export_all]).
 

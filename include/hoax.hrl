@@ -1,42 +1,37 @@
 -import(hoax, [mock/2, stub/3]).
+-include_lib("eunit/include/eunit.hrl").
+
+-ifdef(HOAX_SUPPRESS_DEPRECATION_WARNING).
+-define(DEPRECATION_WARNING, warning_ignored).
+-else.
+-define(DEPRECATION_WARNING,
+    ?debugMsg("WARNING: HOAX_FIXTURE macros are deprecated. Write a generator function using hoax:fixture() instead.")
+).
+-endif.
 
 -define(HOAX_FIXTURE(Setup, Teardown),
     hoax_fixture_test_() ->
-        {foreach,
-            fun() -> hoax:start(), Setup() end,
-            fun(X) -> Teardown(X), hoax:stop() end,
-            hoax_macro:test_list(?MODULE, Setup, Teardown)
-        }
+        ?DEPRECATION_WARNING,
+        hoax:fixture(?MODULE, Setup, Teardown)
 ).
 
 -define(HOAX_FIXTURE,
-    ?HOAX_FIXTURE(fun() -> ok end, fun(_) -> ok end)
-).
-
--define(HOAX_FIXTURE_WITH_ARG(Setup, Teardown),
     hoax_fixture_test_() ->
-        {foreach,
-            fun() -> hoax:start(), Setup() end,
-            fun(X) -> Teardown(X), hoax:stop() end,
-            hoax_macro:test_list(?MODULE, Setup, Teardown)
-        }
-).
-
--define(HOAX_FIXTURE_WITH_ARG,
-    ?HOAX_FIXTURE_WITH_ARG(fun() -> ok end, fun(_) -> ok end)
+        ?DEPRECATION_WARNING,
+        hoax:fixture(?MODULE)
 ).
 
 -define(verifyAll,
-    ((fun () ->
-                    case (hoax_tab:unmet_expectations()) of
-                        []  -> ok;
-                        Unmet -> erlang:error({unmet_expectations,
-                                [{module, ?MODULE},
-                                    {line, ?LINE},
-                                    {expected, Unmet}
-                                ]})
-                end
-        end)())).
+    ((fun() ->
+        case (hoax_tab:unmet_expectations()) of
+            [] -> ok;
+            Unmet -> erlang:error({unmet_expectations,
+                [{module, ?MODULE},
+                    {line, ?LINE},
+                    {expected, Unmet}
+                ]})
+        end
+    end)())).
 
 -define(expect(Func, Args), {Func, Args}).
 -define(expect(Func, Args, Action_or_Count), {Func, Args, Action_or_Count}).
