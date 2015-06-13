@@ -35,7 +35,7 @@ stub(Behaviour, ModuleName, Expectations) ->
 
 fixture(Module) ->
     {foreach, fun start/0, fun (_) -> stop() end, [
-        {Module, F} || {F, 0} <- Module:module_info(exports),
+        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
         default_test_selector(F) == true
     ]}.
 
@@ -43,7 +43,7 @@ fixture(Module, Prefix) when is_atom(Prefix) ->
     fixture(Module, atom_to_list(Prefix));
 fixture(Module, Prefix) when is_list(Prefix) ->
     {foreach, fun start/0, fun (_) -> stop() end, [
-        {Module, F} || {F, 0} <- Module:module_info(exports),
+        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
             default_test_selector(F) == true,
             prefix_test_selector(Prefix, F)
     ]}.
@@ -52,7 +52,7 @@ fixture(Module, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) ->
     {foreach,
         fun () -> start(), Module:Setup() end,
         fun (X) -> Module:Teardown(X), stop() end, [
-        {Module, F} || {F, 0} <- Module:module_info(exports),
+        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
             default_test_selector(F) == true,
             setup_teardown_test_selector(F, Setup, Teardown)
     ]}.
@@ -63,7 +63,7 @@ fixture(Module, Prefix, Setup, Teardown) when is_list(Prefix), is_atom(Setup), i
     {foreach,
         fun () -> start(), Module:Setup() end,
         fun (X) -> Module:Teardown(X), stop() end, [
-        {Module, F} || {F, 0} <- Module:module_info(exports),
+        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
             default_test_selector(F) == true,
             setup_teardown_test_selector(F, Setup, Teardown),
             prefix_test_selector(Prefix, F)

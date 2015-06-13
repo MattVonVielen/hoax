@@ -50,40 +50,40 @@ full_stack_fun_expectation_test() ->
 -define(EXAMPLE_MODULE, module_for_testing_fixtures).
 
 fixture_for_entire_module_without_setup_and_teardown_test() ->
-    ExpectedSortedFunctions = [
+    ExpectedSortedFunctions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
         prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
         setup, test_function1, test_function2
-    ],
+    ]],
 
     {foreach, _, _, Tests} = hoax:fixture(?EXAMPLE_MODULE),
 
-    ?assertEqual(ExpectedSortedFunctions, lists:sort([F || {_, F} <- Tests])).
+    ?assertEqual(ExpectedSortedFunctions, lists:sort(Tests)).
 
 fixture_for_entire_module_with_setup_and_teardown_test() ->
-    ExpectedSortedFunctions = [
+    ExpectedSortedFunctions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
         prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
         test_function1, test_function2
-    ],
+    ]],
 
     {foreach, _, _, Tests} = hoax:fixture(?EXAMPLE_MODULE, setup, teardown),
 
-    ?assertEqual(ExpectedSortedFunctions, lists:sort([F || {_, F} <- Tests])).
+    ?assertEqual(ExpectedSortedFunctions, lists:sort(Tests)).
 
 fixture_for_prefix_without_setup_and_teardown_test() ->
-    ExpectedSortedPrefix1Functions = [
+    ExpectedSortedPrefix1Functions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix1_setup, prefix1_test_function_1, prefix1_test_function_2
-    ],
-    ExpectedSortedPrefix2Functions = [
+    ]],
+    ExpectedSortedPrefix2Functions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix2_setup, prefix2_test_function_1, prefix2_test_function_2
-    ],
+    ]],
 
     {foreach, _, _, Prefix1Tests} = hoax:fixture(?EXAMPLE_MODULE, prefix1),
     {foreach, _, _, Prefix2Tests} = hoax:fixture(?EXAMPLE_MODULE, prefix2),
 
-    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort([F || {_, F} <- Prefix1Tests])),
-    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort([F || {_, F} <- Prefix2Tests])),
+    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort(Prefix1Tests)),
+    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort(Prefix2Tests)),
 
     {foreach, _, _, Prefix1TestsFromString} = hoax:fixture(?EXAMPLE_MODULE, "prefix1"),
     {foreach, _, _, Prefix2TestsFromString} = hoax:fixture(?EXAMPLE_MODULE, "prefix2"),
@@ -92,18 +92,18 @@ fixture_for_prefix_without_setup_and_teardown_test() ->
     ?assertEqual(Prefix2Tests, Prefix2TestsFromString).
 
 fixture_for_prefix_with_setup_and_teardown_test() ->
-    ExpectedSortedPrefix1Functions = [
+    ExpectedSortedPrefix1Functions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix1_test_function_1, prefix1_test_function_2
-    ],
-    ExpectedSortedPrefix2Functions = [
+    ]],
+    ExpectedSortedPrefix2Functions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
         prefix2_test_function_1, prefix2_test_function_2
-    ],
+    ]],
 
     {foreach, _, _, Prefix1Tests} = hoax:fixture(?EXAMPLE_MODULE, prefix1, prefix1_setup, prefix1_teardown),
     {foreach, _, _, Prefix2Tests} = hoax:fixture(?EXAMPLE_MODULE, prefix2, prefix2_setup, prefix2_teardown),
 
-    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort([F || {_, F} <- Prefix1Tests])),
-    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort([F || {_, F} <- Prefix2Tests])),
+    ?assertEqual(ExpectedSortedPrefix1Functions, lists:sort(Prefix1Tests)),
+    ?assertEqual(ExpectedSortedPrefix2Functions, lists:sort(Prefix2Tests)),
 
     {foreach, _, _, Prefix1TestsFromString} = hoax:fixture(?EXAMPLE_MODULE, "prefix1", prefix1_setup, prefix1_teardown),
     {foreach, _, _, Prefix2TestsFromString} = hoax:fixture(?EXAMPLE_MODULE, "prefix2", prefix2_setup, prefix2_teardown),
