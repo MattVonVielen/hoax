@@ -3,7 +3,7 @@
 -export([start/0, stop/0]).
 -export([mock/2, stub/3]).
 -export([fixture/1, fixture/2, fixture/3, fixture/4, test/1]).
-%% -export([parameterized_fixture/1, parameterized_fixture/2, parameterized_fixture/3, parameterized_fixture/4]).
+-export([parameterized_fixture/1, parameterized_fixture/2, parameterized_fixture/3, parameterized_fixture/4]).
 -ignore_xref([mock/2, stub/3]).
 
 %% ===================================================================
@@ -56,6 +56,29 @@ fixture(Module, Prefix, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) 
             prefix_test_selector(Prefix, F)
     end,
     fixture_tuple(Module, 0, fun Module:Setup/0, fun Module:Teardown/1, Selector).
+
+parameterized_fixture(Module) ->
+    fixture_tuple(Module, 1, fun no_op/0, fun no_op/1, fun default_test_selector/1).
+
+parameterized_fixture(Module, Prefix) ->
+    Selector = fun(F) ->
+        default_test_selector(F) andalso prefix_test_selector(Prefix, F)
+    end,
+
+    fixture_tuple(Module, 1, fun no_op/0, fun no_op/1, Selector).
+
+parameterized_fixture(Module, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) ->
+    Selector = fun(F) ->
+        default_test_selector(F) andalso setup_teardown_test_selector(F, Setup, Teardown)
+    end,
+    fixture_tuple(Module, 1, fun Module:Setup/0, fun Module:Teardown/1, Selector).
+
+parameterized_fixture(Module, Prefix, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) ->
+    Selector = fun(F) ->
+        default_test_selector(F) andalso setup_teardown_test_selector(F, Setup, Teardown) andalso
+            prefix_test_selector(Prefix, F)
+    end,
+    fixture_tuple(Module, 1, fun Module:Setup/0, fun Module:Teardown/1, Selector).
 
 test(Func) when is_function(Func, 0) ->
     try

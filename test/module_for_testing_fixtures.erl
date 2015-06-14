@@ -21,3 +21,12 @@ prefix2_test_function_1() -> ok.
 prefix2_test_function_2() -> ok.
 prefix2_setup() -> erlang:put(prefix2_setup_called, true).
 prefix2_teardown(Arg) -> erlang:put(prefix2_teardown_called, {true, Arg}).
+
+parameterized_test_function1(_) -> ok.
+parameterized_test_function2(_) -> ok.
+
+prefix1_parameterized_test_function_1(_) -> ok.
+prefix1_parameterized_test_function_2(_) -> ok.
+
+prefix2_parameterized_test_function_1(_) -> ok.
+prefix2_parameterized_test_function_2(_) -> ok.
