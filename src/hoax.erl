@@ -3,6 +3,7 @@
 -export([start/0, stop/0]).
 -export([mock/2, stub/3]).
 -export([fixture/1, fixture/2, fixture/3, fixture/4, test/1]).
+%% -export([parameterized_fixture/1, parameterized_fixture/2, parameterized_fixture/3, parameterized_fixture/4]).
 -ignore_xref([mock/2, stub/3]).
 
 %% ===================================================================
@@ -34,40 +35,27 @@ stub(Behaviour, ModuleName, Expectations) ->
     hoax_code:compile(ModuleName, Forms).
 
 fixture(Module) ->
-    {foreach, fun start/0, fun (_) -> stop() end, [
-        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
-        default_test_selector(F) == true
-    ]}.
+    fixture_tuple(Module, 0, fun no_op/0, fun no_op/1, fun default_test_selector/1).
 
-fixture(Module, Prefix) when is_atom(Prefix) ->
-    fixture(Module, atom_to_list(Prefix));
-fixture(Module, Prefix) when is_list(Prefix) ->
-    {foreach, fun start/0, fun (_) -> stop() end, [
-        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
-            default_test_selector(F) == true,
-            prefix_test_selector(Prefix, F)
-    ]}.
+fixture(Module, Prefix) ->
+    Selector = fun(F) ->
+        default_test_selector(F) andalso prefix_test_selector(Prefix, F)
+    end,
+
+    fixture_tuple(Module, 0, fun no_op/0, fun no_op/1, Selector).
 
 fixture(Module, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) ->
-    {foreach,
-        fun () -> start(), Module:Setup() end,
-        fun (X) -> Module:Teardown(X), stop() end, [
-        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
-            default_test_selector(F) == true,
-            setup_teardown_test_selector(F, Setup, Teardown)
-    ]}.
+    Selector = fun(F) ->
+        default_test_selector(F) andalso setup_teardown_test_selector(F, Setup, Teardown)
+    end,
+    fixture_tuple(Module, 0, fun Module:Setup/0, fun Module:Teardown/1, Selector).
 
-fixture(Module, Prefix, Setup, Teardown) when is_atom(Prefix) ->
-    fixture(Module, atom_to_list(Prefix), Setup, Teardown);
-fixture(Module, Prefix, Setup, Teardown) when is_list(Prefix), is_atom(Setup), is_atom(Teardown) ->
-    {foreach,
-        fun () -> start(), Module:Setup() end,
-        fun (X) -> Module:Teardown(X), stop() end, [
-        fun Module:F/0 || {F, 0} <- Module:module_info(exports),
-            default_test_selector(F) == true,
-            setup_teardown_test_selector(F, Setup, Teardown),
+fixture(Module, Prefix, Setup, Teardown) when is_atom(Setup), is_atom(Teardown) ->
+    Selector = fun(F) ->
+        default_test_selector(F) andalso setup_teardown_test_selector(F, Setup, Teardown) andalso
             prefix_test_selector(Prefix, F)
-    ]}.
+    end,
+    fixture_tuple(Module, 0, fun Module:Setup/0, fun Module:Teardown/1, Selector).
 
 test(Func) when is_function(Func, 0) ->
     try
@@ -84,9 +72,26 @@ default_test_selector(Func) ->
         (not lists:suffix("_test", Name)) andalso
         (not lists:suffix("_test_", Name)).
 
-prefix_test_selector(Prefix, Func) ->
+prefix_test_selector(Prefix, Func) when is_atom(Prefix) ->
+    prefix_test_selector(atom_to_list(Prefix), Func);
+prefix_test_selector(Prefix, Func) when is_list(Prefix) ->
     Name = atom_to_list(Func),
     lists:prefix(Prefix, Name).
 
 setup_teardown_test_selector(Func, Setup, Teardown) ->
     Func =/= Setup andalso Func =/= Teardown.
+
+no_op() -> ok.
+no_op(_) -> ok.
+
+fixture_tuple(Module, Arity, UserSetup, UserTeardown, Selector) ->
+    Tests = [fun Module:F/Arity || {F, A} <- Module:module_info(exports), A == Arity, Selector(F) == true],
+    TestList = case Arity of
+                   0 -> Tests;
+                   1 -> [{with, Tests}]
+               end,
+    {foreach,
+        fun() -> start(), UserSetup() end,
+        fun(X) -> UserTeardown(X), stop() end,
+        TestList
+    }.
