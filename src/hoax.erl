@@ -1,10 +1,17 @@
 -module(hoax).
 
 -export([start/0, stop/0]).
--export([mock/2, stub/3]).
+-export([mock/2, stub/3, mock_behaviour/3]).
 -export([fixture/1, fixture/2, fixture/3, fixture/4, test/1]).
 -export([parameterized_fixture/1, parameterized_fixture/2, parameterized_fixture/3, parameterized_fixture/4]).
--ignore_xref([mock/2, stub/3]).
+-ignore_xref([mock/2, stub/3, mock_behaviour/3]).
+
+-ifdef(HOAX_SUPPRESS_DEPRECATION_WARNING).
+-define(DEPRECATION_WARNING(_), warning_ignored).
+-else.
+-include_lib("eunit/include/eunit.hrl").
+-define(DEPRECATION_WARNING(Msg), ?debugMsg(Msg)).
+-endif.
 
 %% ===================================================================
 %% hoax API
@@ -27,12 +34,18 @@ mock(ModuleName, Expectations) ->
     Forms = hoax_module:generate(ModuleName, Exports),
     hoax_code:compile(ModuleName, Forms).
 
-stub(Behaviour, ModuleName, Expectations) ->
+mock_behaviour(Behaviour, ModuleName, Expectation) when is_tuple(Expectation) ->
+    mock_behaviour(Behaviour, ModuleName, [Expectation]);
+mock_behaviour(Behaviour, ModuleName, Expectations) ->
     Records = hoax_expect:parse(ModuleName, Expectations),
     Callbacks = hoax_code:get_callback_list(Behaviour, ModuleName),
     hoax_expect:assert_exported(Records, Callbacks),
     Forms = hoax_module:generate(ModuleName, Callbacks),
     hoax_code:compile(ModuleName, Forms).
+
+stub(B, M, E) ->
+    ?DEPRECATION_WARNING("WARNING: hoax:stub/3 is deprecated. Use hoax:mock_behaviour/3 instead."),
+    mock_behaviour(B, M, E).
 
 fixture(Module) ->
     fixture_tuple(Module, 0, fun default_test_selector/1).
