@@ -119,7 +119,7 @@ fixture_tuple(Module, Arity, UserSetup, UserTeardown, Selector) when is_function
     Tests = [fun Module:F/Arity || {F, A} <- Module:module_info(exports), A == Arity, Selector(F) == true],
     TestList = case Arity of
                    0 -> Tests;
-                   1 -> [{with, Tests}]
+                   1 -> [{with, [T]} || T <- Tests]
                end,
     {foreach,
         fun() -> start(), UserSetup() end,
