@@ -29,9 +29,9 @@ unmet_expectations() ->
 
     [ format_unmet_expectation(X) || X <- MatchingRecords ].
 
-increment_counter(E = #expectation{call_count=C}) ->
+record_invocation(E = #expectation{call_count=C,actual_args=A}, Args) ->
     ets:delete_object(hoax, E),
-    ets:insert(hoax, E#expectation{call_count = C+1}).
+    ets:insert(hoax, E#expectation{call_count = C+1, actual_args = [Args | A]}).
 
 lookup_expectations(Key) ->
     ets:lookup(hoax, Key).

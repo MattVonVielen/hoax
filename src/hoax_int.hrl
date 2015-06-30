@@ -5,6 +5,7 @@
 -record(expectation, {
         key              :: m_f_a(),
         expected_args    :: [term()],
+        actual_args = [] :: [[term()]],
         action = default :: action(),
         call_count = 0   :: integer(),
         expected_count   :: integer() | undefined

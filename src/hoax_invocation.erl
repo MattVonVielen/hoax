@@ -14,7 +14,7 @@ handle(M, F, Args) ->
                 #expectation{call_count=X,expected_count=X,expected_args=ExpectedArgs} ->
                     erlang:error({too_many_invocations, X+1, hoax_fmt:fmt({M, F, ExpectedArgs})});
                 #expectation{action = Action} = Record ->
-                    hoax_tab:increment_counter(Record),
+                    hoax_tab:record_invocation(Record, Args),
                     perform(Action, Args)
             end
     end.
