@@ -9,9 +9,19 @@ stop_should_unload_all_hoaxed_modules_test() ->
     ExpectedResult = hoax_test_module:function_one(1, 2),
     hoax:test(fun() ->
         mock(no_such_module, expect_no_interactions),
-        mock(hoax_test_module, ?expect(function_one, ?withArgs([1, 2]), ?andReturn(mocked_return_value))),
+        mock(hoax_test_module, [
+            ?expect(function_one, ?withArgs([3, 4]), ?andReturn(mocked_return_value_2)),
+            ?expect(function_one, ?withArgs([?any, 2]), ?andReturn(mocked_return_value_1))
+        ]),
 
-        ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2))
+        ?assertEqual(mocked_return_value_1, hoax_test_module:function_one(1, 2)),
+        ?assertEqual(mocked_return_value_1, hoax_test_module:function_one(9, 2)),
+        ?assertEqual(mocked_return_value_2, hoax_test_module:function_one(3, 4)),
+        AllArguments = hoax:arguments(fun hoax_test_module:function_one/2),
+        ?assertEqual(3, length(AllArguments)),
+        ?assert(lists:member([1,2], AllArguments)),
+        ?assert(lists:member([9,2], AllArguments)),
+        ?assert(lists:member([3,4], AllArguments))
     end),
 
     Result = hoax_test_module:function_one(1, 2),

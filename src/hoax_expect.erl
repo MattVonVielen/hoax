@@ -52,7 +52,7 @@ expectation(_, Other) ->
 expectation(Mod, Function, Args, Action, Count) ->
     #expectation{
         key = {Mod, Function, length(Args)},
-        args = Args,
+        expected_args = Args,
         action = Action,
         expected_count = Count
     }.

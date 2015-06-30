@@ -10,13 +10,13 @@
 
 -define(EXPECT(F,Args,Action), #expectation{
         key = {m, F, length(Args)},
-        args = Args,
+        expected_args = Args,
         action = Action
     }).
 
 -define(EXPECT_WITH_COUNT(F, Args, Action, Count), #expectation{
         key = {m, F, length(Args)},
-        args = Args,
+        expected_args = Args,
         expected_count = Count,
         action = Action
     }).

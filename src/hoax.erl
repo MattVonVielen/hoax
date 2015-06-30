@@ -1,7 +1,7 @@
 -module(hoax).
 
 -export([start/0, stop/0]).
--export([mock/2, stub/3, mock_behaviour/3]).
+-export([mock/2, stub/3, mock_behaviour/3, arguments/1]).
 -export([fixture/1, fixture/2, fixture/3, fixture/4, test/1]).
 -export([parameterized_fixture/3, parameterized_fixture/4]).
 -ignore_xref([mock/2, stub/3, mock_behaviour/3]).
@@ -12,6 +12,8 @@
 -include_lib("eunit/include/eunit.hrl").
 -define(DEPRECATION_WARNING(Msg), ?debugMsg(Msg)).
 -endif.
+
+-include("hoax_int.hrl").
 
 %% ===================================================================
 %% hoax API
@@ -46,6 +48,15 @@ mock_behaviour(Behaviour, ModuleName, Expectations) ->
 stub(B, M, E) ->
     ?DEPRECATION_WARNING("WARNING: hoax:stub/3 is deprecated. Use hoax:mock_behaviour/3 instead."),
     mock_behaviour(B, M, E).
+
+arguments(F) when is_function(F) ->
+    Info = erlang:fun_info(F),
+    Module = proplists:get_value(module, Info),
+    Name = proplists:get_value(name, Info),
+    Arity = proplists:get_value(arity, Info),
+    arguments({Module, Name, Arity});
+arguments({_Module, _Name, _Arity} = Key) ->
+    lists:append([Args || #expectation{actual_args=Args} <- hoax_tab:lookup_expectations(Key)]).
 
 fixture(Module) ->
     fixture_tuple(Module, 0, fun default_test_selector/1).
