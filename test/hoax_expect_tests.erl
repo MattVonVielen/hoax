@@ -33,49 +33,49 @@ assert_exported_should_return_when_function_in_list_test() ->
 parse_should_allow_return_action_test() ->
     Expectation = {function_1, [arg1], {return, some_value}, 3},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_1, 1}, args=[arg1],
+    ExpectedOutput = #expectation{key={test_mod, function_1, 1}, expected_args=[arg1],
                                   action={return, some_value}, expected_count=3},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_throw_action_test() ->
     Expectation = {function_2, [arg1, arg2], {throw, some_error}, 3},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, args=[arg1, arg2],
+    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, expected_args=[arg1, arg2],
                                   action={throw, some_error}, expected_count=3},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_error_action_test() ->
     Expectation = {function_2, [arg1, arg2], {error, some_error}, 3},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, args=[arg1, arg2],
+    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, expected_args=[arg1, arg2],
                                   action={error, some_error}, expected_count=3},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_exit_action_test() ->
     Expectation = {function_2, [arg1, arg2], {exit, some_error}, 3},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, args=[arg1, arg2],
+    ExpectedOutput = #expectation{key={test_mod, function_2, 2}, expected_args=[arg1, arg2],
                                   action={exit, some_error}, expected_count=3},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_action_without_count_test() ->
     Expectation = {function_0, [], {return, some_value}},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, args=[],
+    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, expected_args=[],
                                   action={return, some_value}},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_no_action_given_with_count_test() ->
     Expectation = {function_0, [], 3},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, args=[],
+    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, expected_args=[],
                                   action=default, expected_count=3},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_allow_no_action_given_and_no_count_given_test() ->
     Expectation = {function_0, []},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, args=[],
+    ExpectedOutput = #expectation{key={test_mod, function_0, 0}, expected_args=[],
                                   action=default},
     ?assertEqual(ExpectedOutput, Result).
 
@@ -98,7 +98,7 @@ parse_should_allow_fun_in_lieu_of_args_test() ->
     Fun = fun(Arg1, Arg2,Arg3) -> {Arg1,Arg2,Arg3} end,
     Expectation = {function_0, Fun},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
-    ExpectedOutput = #expectation{key={test_mod, function_0, 3}, args=['_', '_', '_'],
+    ExpectedOutput = #expectation{key={test_mod, function_0, 3}, expected_args=['_', '_', '_'],
                                   action={return_fun_result, Fun}},
     ?assertEqual(ExpectedOutput, Result).
 

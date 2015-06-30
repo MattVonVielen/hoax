@@ -4,7 +4,7 @@
 
 -include("hoax_int.hrl").
 
-fmt(#expectation{key = {M,F,_}, args=Args}) ->
+fmt(#expectation{key = {M,F,_}, expected_args = Args}) ->
     fmt({M, F, Args});
 fmt({M, F, Args}) ->
     lists:flatten(io_lib:format("~s:~s(~s)", [M, F, format_args(Args)])).

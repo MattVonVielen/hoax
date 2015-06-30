@@ -11,7 +11,7 @@ handle(M, F, Args) ->
             case find_matching_args(Args, Records) of
                 false ->
                     erlang:error({unexpected_arguments, hoax_fmt:fmt({M, F, Args})});
-                #expectation{call_count=X,expected_count=X,args=ExpectedArgs} ->
+                #expectation{call_count=X,expected_count=X,expected_args=ExpectedArgs} ->
                     erlang:error({too_many_invocations, X+1, hoax_fmt:fmt({M, F, ExpectedArgs})});
                 #expectation{action = Action} = Record ->
                     hoax_tab:increment_counter(Record),
@@ -22,7 +22,7 @@ handle(M, F, Args) ->
 find_matching_args(Args, Records) ->
     keyfind(Args, Records).
 
-keyfind(ActualArgs, [ Expectation = #expectation{args = ExpectedArgs} | Rest ]) ->
+keyfind(ActualArgs, [ Expectation = #expectation{expected_args = ExpectedArgs} | Rest ]) ->
     case replace_wildcards(ActualArgs, ExpectedArgs) of
         ActualArgs -> Expectation;
         _          -> keyfind(ActualArgs, Rest)
