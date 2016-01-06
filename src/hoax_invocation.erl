@@ -31,7 +31,7 @@ keyfind(_, []) ->
     false.
 
 perform(default, _)         -> '$_hoax_default_return_$';
-perform({return_fun_result, Fun}, Args) ->
+perform(Fun, Args) when is_function(Fun) ->
     erlang:apply(Fun, Args);
 perform({return, Value}, _) -> Value;
 perform({Error, Reason}, _) -> erlang:Error(Reason).

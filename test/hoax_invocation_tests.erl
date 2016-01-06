@@ -34,7 +34,7 @@ should_return_expected_value_when_args_match() ->
 should_return_fun_result_when_expected_args_for_fun() ->
     Fun = fun(Val1, Val2) -> {Val1, Val2} end,
 
-    hoax_tab:insert( ?EXPECT(f,['_','_'], {return_fun_result,Fun}) ),
+    hoax_tab:insert( ?EXPECT(f,['_','_'], Fun) ),
 
     Result = hoax_invocation:handle(m, f, [1, 2]),
 

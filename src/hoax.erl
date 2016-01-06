@@ -1,6 +1,7 @@
 -module(hoax).
 
 -export([start/0, stop/0]).
+-export([expect/1]).
 -export([mock/2, stub/3, mock_behaviour/3, arguments/1]).
 -export([fixture/1, fixture/2, fixture/3, fixture/4, test/1]).
 -export([parameterized_fixture/3, parameterized_fixture/4]).
@@ -26,6 +27,23 @@ stop() ->
     lists:foreach(
         fun hoax_code:purge_and_delete/1,
         hoax_tab:delete()).
+
+expect(RecordList) when is_list(RecordList) ->
+    ByModule = lists:foldr(
+                 fun (Rec = #expectation{key={Mod,_,_}}, Dict) ->
+                         dict:append(Mod, Rec, Dict)
+                 end,
+                 dict:new(),
+                 RecordList),
+    dict:fold(
+      fun (ModuleName, Records, _) ->
+              Exports = hoax_code:get_export_list(ModuleName, Records),
+              hoax_expect:assert_exported(Records, Exports),
+              Forms = hoax_module:generate(ModuleName, Exports),
+              hoax_code:compile(ModuleName, Forms)
+      end,
+      ok,
+      ByModule).
 
 mock(ModuleName, Expectation) when is_tuple(Expectation) ->
     mock(ModuleName, [Expectation]);

@@ -1,4 +1,5 @@
 -import(hoax, [mock/2, stub/3, mock_behaviour/3]).
+-compile([{parse_transform, hoax_transform}]).
 -include_lib("eunit/include/eunit.hrl").
 
 -ifdef(HOAX_SUPPRESS_DEPRECATION_WARNING).
