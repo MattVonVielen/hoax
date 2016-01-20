@@ -31,9 +31,9 @@ transform_expression({'try', Line, Body, Clauses, Handlers, After}) ->
                   [transform_expression(Handler) || Handler <- Handlers],
                   [transform_expression(Expr) || Expr <- After]};
 % we've found a call to either expect/* or allow/*
-transform_expression({call, Line, {atom, _, Verb}, Expectations}) when Verb == expect; Verb == allow ->
+transform_expression({call, Line, Call = {remote, Line, {atom, Line, hoax}, {atom, Line, Verb}}, Expectations}) when Verb == expect; Verb == allow ->
     Contents = lists:flatten([transform_expectation_contents(Expectation) || Expectation <- Expectations]),
-    {call, Line, {remote, Line, {atom, Line, hoax}, {atom, Line, Verb}}, [list_to_forms(Line, Contents)]};
+    {call, Line, Call, [list_to_forms(Line, Contents)]};
 transform_expression({call, Line, Call, Arguments}) ->
     {call, Line, Call, [transform_expression(Arg) || Arg <- Arguments]};
 transform_expression(Other) ->
@@ -70,7 +70,7 @@ field_to_forms(actual_args, Args, Line) ->
     list_to_forms(Line, Args);
 field_to_forms(action, {default, _}, Line) ->
     {atom, Line, default};
-field_to_forms(action, {{Guard, Action}, Args}, Line) -> 
+field_to_forms(action, {{Guard, Action}, Args}, Line) ->
     {'fun', Line, {clauses, [{clause, Line, Args, Guard, Action}]}};
 field_to_forms(call_count, Count, Line) ->
     {integer, Line, Count};

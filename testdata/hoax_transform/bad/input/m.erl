@@ -3,11 +3,11 @@
 -compile([export_all, {parse_transform, hoax_transform}]).
 
 f() ->
-    expect(
+    hoax:expect(
         not_a_function_call
      ).
 
 g() ->
-    expect(receive
+    hoax:expect(receive
 		   not_a_function_call_either -> output
 	   end).

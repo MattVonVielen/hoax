@@ -33,7 +33,7 @@ stop_should_unload_all_hoaxed_modules_with_transform_test() ->
     ExpectedResult = hoax_test_module:function_one(1, 2),
     hoax:test(fun() ->
         mock(no_such_module, expect_no_interactions),
-        expect(receive
+        hoax:expect(receive
                        hoax_test_module:function_one(3, 4) -> mocked_return_value_2;
                        hoax_test_module:function_one(_, 2) -> mocked_return_value_1
                end),
@@ -58,7 +58,7 @@ should_be_able_to_mock_sticky_modules_with_transform_test() ->
     code:stick_mod(hoax_test_module),
     try
         hoax:test(fun() ->
-            expect(receive hoax_test_module:function_one(1, 2) -> mocked_return_value end),
+            hoax:expect(receive hoax_test_module:function_one(1, 2) -> mocked_return_value end),
             ?assertEqual(mocked_return_value, hoax_test_module:function_one(1, 2)),
             ?assert(code:is_sticky(hoax_test_module))
         end),
@@ -69,4 +69,3 @@ should_be_able_to_mock_sticky_modules_with_transform_test() ->
     after
         code:unstick_mod(hoax_test_module)
     end.
-
