@@ -10,7 +10,7 @@ handle(M, F, Args) ->
         Records ->
             case find_matching_args(Args, Records) of
                 false ->
-                    erlang:error({unexpected_arguments, hoax_fmt:fmt({M, F, Args})});
+                    unexpected_arguments(M, F, Args, Records);
                 #expectation{call_count=X,expected_count=X,expected_args=ExpectedArgs} ->
                     erlang:error({too_many_invocations, X+1, hoax_fmt:fmt({M, F, ExpectedArgs})});
                 #expectation{action = Action} = Record ->
@@ -18,6 +18,24 @@ handle(M, F, Args) ->
                     perform(Action, Args)
             end
     end.
+
+% As the most-common case, handle a single expectation separately to provide better error detail
+unexpected_arguments(M, F, Args, [#expectation{expected_args = Expected}]) ->
+    Arity = length(Args),
+    FuncRep = flatfmt("~s:~s/~b", [M, F, Arity]),
+    ArgsNotMatched = lists:foldl(
+        fun ({_, ExpectedArg, ActualArg}, Acc) when ExpectedArg == ActualArg ->
+                Acc;
+            ({Seq, ExpectedArg, ActualArg}, Acc) ->
+                Info = flatfmt("parameter ~b expected ~p but got ~p", [Seq, ExpectedArg, ActualArg]),
+                [Info | Acc]
+        end,
+        [],
+        lists:zip3(lists:seq(1, Arity), Expected, Args)
+    ),
+    erlang:error({unexpected_arguments, [FuncRep | lists:reverse(ArgsNotMatched)]});
+unexpected_arguments(M, F, Args, Records) when length(Records) > 1 ->
+    erlang:error({unexpected_arguments, hoax_fmt:fmt({M, F, Args})}).
 
 find_matching_args(Args, Records) ->
     keyfind(Args, Records).
@@ -41,3 +59,6 @@ replace_wildcards(ActualArgs, ExpectedArgs) ->
 
 replace_wildcard(Actual, '_') -> Actual;
 replace_wildcard(_, Expected) -> Expected.
+
+flatfmt(Fmt, Args) ->
+    lists:flatten(io_lib:format(Fmt, Args)).
