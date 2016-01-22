@@ -3,7 +3,6 @@
 -compile([export_all]).
 
 -include_lib("eunit/include/eunit.hrl").
--include_lib("hoax/include/hoax.hrl").
 -include("../src/hoax_int.hrl").
 
 -define(EXPORTS, [{f,2},{g,1},{h,0}]).
@@ -70,16 +69,24 @@ should_exit_with_expected_error_when_args_match() ->
 
     ?assertExit(an_error, hoax_invocation:handle(m, f, [1, 2])).
 
-should_throw_when_args_do_not_match() ->
+should_throw_when_args_do_not_match_and_exactly_1_expectation() ->
+    hoax_tab:insert(?EXPECT(f, [1,2,3,4], {return, a_result})),
+
+    ExpectedError = {unexpected_arguments, ["m:f/4", "parameter 2 expected 2 but got a", "parameter 4 expected 4 but got z"]},
+    % try
+    %
+    % catch error:ActualError ->
+    %     ?debugFmt("ExpectedError:: ~p", [ExpectedError]),
+    %     ?debugFmt("ActualError:: ~p", [ActualError]),
+    %     ?assert(false)
+    % end.
+    ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a, 3, z])).
+
+should_throw_when_args_do_not_match_and_multiple_expectations() ->
     hoax_tab:insert(?EXPECT(f, [1,2], {return, a_result})),
+    hoax_tab:insert(?EXPECT(f, [1,7], {return, a_result})),
 
     ExpectedError = {unexpected_arguments, "m:f(1,a)"},
-    ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).
-
-should_throw_when_args_do_not_match_wildcard_pattern() ->
-    hoax_tab:insert(?EXPECT(f, ['_',2], {return, a_result})),
-
-    ExpectedError = {unexpected_arguments,  "m:f(1,a)"},
     ?assertError(ExpectedError, hoax_invocation:handle(m, f, [1, a])).
 
 should_throw_when_call_count_equals_expected_count() ->
