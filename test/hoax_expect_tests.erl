@@ -99,7 +99,7 @@ parse_should_allow_fun_in_lieu_of_args_test() ->
     Expectation = {function_0, Fun},
     [Result] = hoax_expect:parse(test_mod, [Expectation]),
     ExpectedOutput = #expectation{key={test_mod, function_0, 3}, expected_args=['_', '_', '_'],
-                                  action={return_fun_result, Fun}},
+                                  action=Fun},
     ?assertEqual(ExpectedOutput, Result).
 
 parse_should_throw_when_bad_expectation_syntax_test_() ->
