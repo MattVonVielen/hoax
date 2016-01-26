@@ -71,7 +71,7 @@ field_to_forms(actual_args, Args, Line) ->
 field_to_forms(action, {default, _}, Line) ->
     {atom, Line, default};
 field_to_forms(action, {{Guard, Action}, Args}, Line) ->
-    {'fun', Line, {clauses, [{clause, Line, Args, Guard, Action}]}};
+    {'fun', Line, {clauses, [{clause, Line, wildcard_variables(Line, length(Args)), Guard, Action}]}};
 field_to_forms(call_count, Count, Line) ->
     {integer, Line, Count};
 field_to_forms(expected_count, undefined, Line) ->
@@ -83,6 +83,9 @@ underscores_to_atoms({var, Line, '_'}) ->
     {atom, Line, '_'};
 underscores_to_atoms(Other) ->
     Other.
+
+wildcard_variables(Line, Arity) ->
+    [ {var, Line, list_to_atom([$_|integer_to_list(Num)])} || Num <- lists:seq(1, Arity)].
 
 list_to_forms(Line, []) ->
     {nil, Line};
