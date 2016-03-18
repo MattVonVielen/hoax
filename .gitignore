@@ -6,3 +6,4 @@ rebar.cmd
 .rebar/
 .idea/
 *.iml
+_build/
