@@ -2,6 +2,7 @@ language: erlang
 otp_release:
   - 18.2.1
   - R15B03
+script: make eunit
 notifications:
   email: false
   slack:
