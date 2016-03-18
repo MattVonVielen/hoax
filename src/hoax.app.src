@@ -1,5 +1,8 @@
 {application, hoax,
  [
   {description, "Yet another mocking library for Erlang"},
-  {vsn, "0.10.2"}
+  {vsn, "git"},
+  {maintainers, ["Matt Campbell"]},
+  {licenses, ["Apache"]},
+  {links, [{"Github", "https://github.com/xenolinguist/hoax"}]}
  ]}.

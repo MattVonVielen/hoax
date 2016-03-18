@@ -1,4 +1,6 @@
+[![GitHub tag](https://img.shields.io/github/tag/xenolinguist/hoax.svg)]()
 [![Build Status](https://secure.travis-ci.org/xenolinguist/hoax.png)](http://travis-ci.org/xenolinguist/hoax)
+[![Hex.pm](https://img.shields.io/hexpm/v/hoax.svg)]()
 
   * [Build](#build)
 
@@ -25,4 +27,3 @@ rebar eunit
 _Note that hoax's unit tests require Eunit >= 2.2.1 (OTP R14B04)._
 
   [1]: https://github.com/rebar/rebar "Rebar - A build tool for Erlang"
-

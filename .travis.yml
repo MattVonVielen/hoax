@@ -7,3 +7,12 @@ notifications:
   email: false
   slack:
     secure: FQNQkw47sV9wN12HwBdhqInXcS7nD4j43aQUiJGLUWoeEUlHD9UmW+9P0jofAcd7O2WTBKJcEFH2sBnEpdoCg3BG8yiYqF/HMcmcrfauaCSfqT+3HnnaJ9If15qbuBFewMvZlJCi0LrpoRN/7oK71Y6NHqv5jxjyGC1ALYPVYCw=
+env:
+  global:
+  - secure: BCj0kljNYvN4VXkF0RpYo9D5w/24EPLqEeVCLWrfhCmMakRJFoEsu7oryc2ZUV6LZCJXoizmHaKlD4hQChdLi0DXOGG91Ni+pMEjialLvcFOQGMCYTBVphEIWqhvo+4RT40RH0RdKI8YtDHwfO7h6pj+8bCc2u0k/x5ULYe8C7w=
+  - secure: M9EjH+fUfqmLLaSq1yh6Tv9RF75nv2XJxYBpSyVGBRNh8jbih4kWvR6W0we+qnYHcrTXZNYruvBXSJ2trvfnIsIUXkL6m9SkRUMIhlFZND126IkmYjJ5z+OWh+A06Ko+eY2hMJeLj31eUfvfJ2ZP715VVzT3GxxW1XrQ2BOkC28=
+deploy:
+  provider: script
+  script: make publish
+  on:
+    tags: true
