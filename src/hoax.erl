@@ -21,6 +21,7 @@
 %% ===================================================================
 
 start() ->
+    hoax_tab:exists() andalso stop(),
     hoax_tab:create().
 
 stop() ->

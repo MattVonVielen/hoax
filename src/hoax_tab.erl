@@ -8,6 +8,9 @@
 insert(Expect) ->
     ets:insert(hoax, Expect).
 
+exists() ->
+    ets:info(hoax, name) =:= hoax.
+
 create() ->
     ets:new(hoax, [named_table, public, bag, {keypos, #expectation.key}]).
 

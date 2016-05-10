@@ -29,6 +29,23 @@ stop_should_unload_all_hoaxed_modules_test() ->
 
     ?assertMatch({error, nofile}, code:ensure_loaded(no_such_module)).
 
+start_should_detect_and_clean_up_from_runaway_test_if_table_already_exists_test() ->
+    %% Capture the actual return value of this expression so we can verify it's no longer mocked later
+    ExpectedResult = hoax_test_module:function_one(1, 2),
+
+    %% Simulate a runaway test (one in which hoax:stop/0 wasn't called)
+    %% Start, and mock something
+    hoax:start(),
+    hoax:mock(hoax_test_module, ?expect(function_one, ?withArgs([1, 2]), ?andReturn(mocked_return_value_1))),
+    %% Deliberately omitting the stop() here - here's where the "previous test" ran away.
+
+    %% if hoax:start doesn't correctly detect the table issue, then this will fail before the fun is evaluated.
+    hoax:test(fun() ->
+                      %% Ensure that cleaning up from the runaway test also restored original module code.
+                      Result = hoax_test_module:function_one(1, 2),
+                      ?assertEqual(ExpectedResult, Result)
+              end).
+
 should_be_able_to_mock_sticky_modules_test() ->
     ExpectedResult = hoax_test_module:function_one(1, 2),
     code:stick_mod(hoax_test_module),
