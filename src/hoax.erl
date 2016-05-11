@@ -141,7 +141,17 @@ fixture_tuple(Module, Arity, UserSetup, UserTeardown, Selector) when is_function
                    1 -> [{with, [T]} || T <- Tests]
                end,
     {foreach,
-        fun() -> start(), UserSetup() end,
+        fun() -> fixture_setup(UserSetup) end,
         fun(X) -> UserTeardown(X), stop() end,
         TestList
     }.
+
+fixture_setup(UserSetup) ->
+    try
+        start(),
+        UserSetup()
+    catch
+        X:Y ->
+            stop(),
+            erlang:X(Y)
+    end.

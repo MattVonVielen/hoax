@@ -78,7 +78,7 @@ full_stack_fun_expectation_test() ->
 
 fixture_for_entire_module_without_setup_and_teardown_test() ->
     ExpectedSortedFunctions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
-        prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
+        failing_setup, prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
         prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
         setup, test_function1, test_function2
     ]],
@@ -100,7 +100,7 @@ fixture_for_entire_module_with_setup_and_teardown_calls_setup_and_teardown_test(
 
 fixture_for_entire_module_with_setup_and_teardown_omits_setup_and_teardown_test() ->
     ExpectedSortedFunctions = [ fun ?EXAMPLE_MODULE:F/0 || F <- [
-        prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
+        failing_setup, prefix1_setup, prefix1_test_function_1, prefix1_test_function_2,
         prefix2_setup, prefix2_test_function_1, prefix2_test_function_2,
         test_function1, test_function2
     ]],
@@ -228,3 +228,9 @@ parameterized_fixture_with_string_prefix_with_setup_and_teardown_calls_setup_and
 
     ?assertEqual(true, erlang:get(prefix2_setup_called)),
     ?assertEqual({true, some_argument}, erlang:get(prefix2_teardown_called)).
+
+fixture_when_user_setup_fails_should_tear_down_test() ->
+    {foreach, Setup, _, _} = hoax:fixture(?EXAMPLE_MODULE, failing_setup, teardown),
+
+    ?assertError({setup_failed, for_reasons}, Setup()),
+    ?assertNot(hoax_tab:exists()).

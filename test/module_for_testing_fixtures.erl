@@ -30,3 +30,6 @@ prefix1_parameterized_test_function_2(_) -> ok.
 
 prefix2_parameterized_test_function_1(_) -> ok.
 prefix2_parameterized_test_function_2(_) -> ok.
+
+failing_setup() ->
+    erlang:error({setup_failed, for_reasons}).
