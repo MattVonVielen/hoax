@@ -16,3 +16,4 @@ deploy:
   script: make publish
   on:
     tags: true
+    erlang: 18.2.1
