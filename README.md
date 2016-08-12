@@ -1,7 +1,7 @@
 [![GitHub tag](https://img.shields.io/github/tag/xenolinguist/hoax.svg)]()
 [![Build Status](https://secure.travis-ci.org/xenolinguist/hoax.png)](http://travis-ci.org/xenolinguist/hoax)
 [![Hex.pm](https://img.shields.io/hexpm/v/hoax.svg)]()
-
+[![Gitter Chat](https://badges.gitter.im/xenolinguist/hoax.svg)](https://gitter.im/xenolinguist/hoax)
   * [Build](#build)
 
 hoax
