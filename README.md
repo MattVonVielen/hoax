@@ -6,6 +6,8 @@
 
 hoax
 ====
+
+[![Join the chat at https://gitter.im/xenolinguist/hoax](https://badges.gitter.im/xenolinguist/hoax.svg)](https://gitter.im/xenolinguist/hoax?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 Yet another mocking library for Erlang.
 
 Build
