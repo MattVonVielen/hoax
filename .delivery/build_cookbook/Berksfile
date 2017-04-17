@@ -1,0 +1,3 @@
+source 'https://supermarket.chef.io'
+
+cookbook 'build-cookbook', path: File.expand_path('.')
