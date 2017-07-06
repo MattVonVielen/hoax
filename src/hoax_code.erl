@@ -54,13 +54,7 @@ restore_coverdata(ModName) ->
 
 has_coverdata_backup(ModName) ->
     Filename = coverdata_filename(ModName),
-    case file:open(Filename, [read]) of
-        {ok, D} ->
-                file:close(D),
-            true;
-        _ ->
-            false
-    end.
+    filelib:is_file(Filename).
 
 purge_and_delete(ModuleName) ->
     Sticky = code:is_sticky(ModuleName),
